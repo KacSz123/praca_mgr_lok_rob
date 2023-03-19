@@ -41,6 +41,19 @@ class ProbabLocalization():
             
             self.__posMap.append((_pose, self.makeProbabDescrOneScan(_scango)))
         print(self.__posMap)
+    def loadMapLocalMin(self,fileName):
+        _scan = []
+        _scango = []
+        _pose = [0, 0, 0]
+        json_data = open(fileName)
+        data = json.load(json_data)
+        for j in range(0, len(data)):
+            # Wczytanie skanu z pierwszego zestawu danych
+            _scango = data[j]["scan"]
+            _pose = data[j]["pose"]
+            
+            self.__posMap.append((_pose, self.makeProbabDescrOneScanLocalMin(_scango)))
+        print(self.__posMap)
         
 
     def makeProbabDescrOneScan(self, scan):
@@ -58,6 +71,25 @@ class ProbabLocalization():
             currentProbList.append((GetMuSigmaFromEqSqrt(currentList)))
         return currentProbList
 
+    def makeProbabDescrOneScanLocalMin(self, scan):
+        localMin = np.argmin(scan)
+        newScan =  scan[localMin:-1] + [scan[-1]]+scan[0:localMin]
+        
+        perSection = (len(scan))//self.__sectionNumber
+        currentProbList = []
+        
+        for i in range(0, self.__sectionNumber):
+            currentList=[]
+            
+            for j in range(0, perSection):
+                    if (
+                        not math.isnan(newScan[i*perSection+j])
+                        and not math.isinf(newScan[i*perSection+j])
+                    ):
+                        currentList.append(newScan[i*perSection+j])
+            currentProbList.append((GetMuSigmaFromEqSqrt(currentList)))
+        return currentProbList
+
 
     
     def locateRobot(self):
@@ -71,6 +103,21 @@ class ProbabLocalization():
                 diff+=abs((i[1][j][0]-tmpProbList[j][0])+(i[1][j][0]-tmpProbList[j][0]))
             diffList.append(diff)
         print("Punkt to:", self.__posMap[np.argmin(diffList)][0])
+   
+    
+    def locateRobotLocalMinimum(self):
+        tmpscan=self.__scan
+        print(tmpscan)
+        tmpProbList = self.makeProbabDescrOneScanLocalMin(list(tmpscan))
+        #tmpProbList.sort()
+        diffList = []
+        for i in self.__posMap:
+            diff = 0
+            for j in range(0,self.__sectionNumber):
+                diff+=abs((i[1][j][0]-tmpProbList[j][0])+(i[1][j][0]-tmpProbList[j][0]))
+            diffList.append(diff)
+        print("Punkt to:", self.__posMap[np.argmin(diffList)][0])
+   
     def callback(self,msg):
         self.__scan = msg.ranges
 # 3
@@ -95,7 +142,7 @@ def __main__():
     hm = ProbabLocalization()
     hm.initTopicConnection()
     time.sleep(0.1)
-    hm.loadMap(fileName)
+    hm.loadMapLocalMin(fileName)
     #hm.MakeHistMap()
     # hm.MakeOrientMap()
     # hm.printHistMap()
@@ -103,6 +150,6 @@ def __main__():
     
     print('###############################')
     # hm.printHistOrientMap()
-    hm.locateRobot()
+    hm.locateRobotLocalMinimum()
 if __name__ == "__main__":
     __main__()
