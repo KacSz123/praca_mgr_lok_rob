@@ -131,14 +131,14 @@ class ProbabLocalization():
         for i in range(0, len(tmpOrientList)):
             sum += abs((tmpOrientList[i][0]-currentPoint[i][0])+(tmpOrientList[i][1]-currentPoint[i][1]))
         diffOrient.append(sum)
-        currentPoint = currentPoint[-1:]+currentPoint[:-1]
+        currentPoint.append(currentPoint.pop(0))
         sum = 0
         while copyCurrentPoint != currentPoint:
             sum=0
             for i in range(0, len(tmpOrientList)):
                 sum += abs((tmpOrientList[i][0]-currentPoint[i][0])+(tmpOrientList[i][1]-currentPoint[i][1]))
             diffOrient.append(sum)
-            currentPoint = currentPoint[-1:]+currentPoint[:-1]
+            currentPoint.append(currentPoint.pop(0))
         orient = 0
 
 
