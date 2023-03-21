@@ -25,10 +25,13 @@ class ProbabLocalization():
     __rawdata = []
     __scan=[]
     
-    def __init__(self, nodeName="myNodeHistMap", sectionsNumber = 4):
+    def __init__(self, nodeName="myNodeHistMap", sectionsNumber = 8,sectionsNumberOrient = 20):
         self.__sectionNumber = sectionsNumber
+        self.__sectionNumberOrient = sectionsNumberOrient
         rospy.init_node(nodeName)
-    def loadMap(self,fileName):
+
+
+    def loadMapOrient(self,fileName):
         _scan = []
         _scango = []
         _pose = [0, 0, 0]
@@ -39,9 +42,10 @@ class ProbabLocalization():
             _scango = data[j]["scan"]
             _pose = data[j]["pose"]
             
-            self.__posMap.append((_pose, self.makeProbabDescrOneScan(_scango)))
-        print(self.__posMap)
+            self.__orientMap.append((_pose, self.makeProbabDescrOneScanOrient(_scango)))
+        #print(self.__orientMap)
     def loadMapLocalMin(self,fileName):
+        self.loadMapOrient(fileName)
         _scan = []
         _scango = []
         _pose = [0, 0, 0]
@@ -53,13 +57,13 @@ class ProbabLocalization():
             _pose = data[j]["pose"]
             
             self.__posMap.append((_pose, self.makeProbabDescrOneScanLocalMin(_scango)))
-        print(self.__posMap)
+        #print(self.__posMap)
         
 
-    def makeProbabDescrOneScan(self, scan):
-        perSection = (len(scan))//self.__sectionNumber
+    def makeProbabDescrOneScanOrient(self, scan):
+        perSection = (len(scan))//self.__sectionNumberOrient
         currentProbList = []
-        for i in range(0, self.__sectionNumber):
+        for i in range(0, self.__sectionNumberOrient):
             currentList=[]
             
             for j in range(0, perSection):
@@ -92,9 +96,9 @@ class ProbabLocalization():
 
 
     
-    def locateRobot(self):
+    def locateRobotOrient(self):
         tmpscan=self.__scan
-        tmpProbList = self.makeProbabDescrOneScan(tmpscan)
+        tmpProbList = self.makeProbabDescrOneScanOrient(tmpscan)
         #tmpProbList.sort()
         diffList = []
         for i in self.__posMap:
@@ -103,13 +107,13 @@ class ProbabLocalization():
                 diff+=abs((i[1][j][0]-tmpProbList[j][0])+(i[1][j][0]-tmpProbList[j][0]))
             diffList.append(diff)
         print("Punkt to:", self.__posMap[np.argmin(diffList)][0])
-   
+    
     
     def locateRobotLocalMinimum(self):
         tmpscan=self.__scan
-        print(tmpscan)
+        #print(tmpscan)
         tmpProbList = self.makeProbabDescrOneScanLocalMin(list(tmpscan))
-        #tmpProbList.sort()
+        tmpOrientList = self.makeProbabDescrOneScanOrient(list(tmpscan))
         diffList = []
         for i in self.__posMap:
             diff = 0
@@ -117,7 +121,31 @@ class ProbabLocalization():
                 diff+=abs((i[1][j][0]-tmpProbList[j][0])+(i[1][j][0]-tmpProbList[j][0]))
             diffList.append(diff)
         print("Punkt to:", self.__posMap[np.argmin(diffList)][0])
-   
+        
+        ############# orientacja
+        
+        currentPoint = self.__orientMap[np.argmin(diffList)][1]
+        copyCurrentPoint = currentPoint.copy()
+        sum=0
+        diffOrient = []
+        for i in range(0, len(tmpOrientList)):
+            sum += abs((tmpOrientList[i][0]-currentPoint[i][0])+(tmpOrientList[i][1]-currentPoint[i][1]))
+        diffOrient.append(sum)
+        currentPoint = currentPoint[-1:]+currentPoint[:-1]
+        sum = 0
+        while copyCurrentPoint != currentPoint:
+            sum=0
+            for i in range(0, len(tmpOrientList)):
+                sum += abs((tmpOrientList[i][0]-currentPoint[i][0])+(tmpOrientList[i][1]-currentPoint[i][1]))
+            diffOrient.append(sum)
+            currentPoint = currentPoint[-1:]+currentPoint[:-1]
+        orient = 0
+
+
+        orient = math.radians(abs(np.argmin(diffOrient))*(360//self.__sectionNumberOrient))
+        print("Orientacja!!!!!: ", orient)
+        #print(currentPoint)
+
     def callback(self,msg):
         self.__scan = msg.ranges
 # 3
