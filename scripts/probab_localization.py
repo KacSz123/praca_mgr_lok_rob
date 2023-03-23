@@ -32,7 +32,6 @@ class ProbabLocalization():
 
 
     def loadMapOrient(self,fileName):
-        _scan = []
         _scango = []
         _pose = [0, 0, 0]
         json_data = open(fileName)
@@ -124,7 +123,6 @@ class ProbabLocalization():
             diffOrient.append(sum)
             currentPoint.append(currentPoint.pop(0))
         orient = 0
-
         orient = math.radians(abs(np.argmin(diffOrient))*(360//self.__sectionNumberOrient))
         print("\nOrientation: ", orient)
         #print(currentPoint)

@@ -57,7 +57,7 @@ class mapCreation():
 def main():
     myMap=mapCreation()
     myMap.initTopicConnection()
-    myMap.writeMapToJsonFile((-4,-1),(3,4.5))
+    myMap.writeMapToJsonFile((-4,-1),(3, 4.5))
     # rospy.spin()
 
 
