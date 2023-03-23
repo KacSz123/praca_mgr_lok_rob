@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
-<robot name="m2wr" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="myrobot" xmlns:xacro="http://www.ros.org/wiki/xacro">
   
-  <xacro:include filename="$(find m2wr_description)/urdf/materials.xacro" />
-  <xacro:include filename="$(find m2wr_description)/urdf/m2wr.gazebo" />
-  <xacro:include filename="$(find m2wr_description)/urdf/macros.xacro" />
+  <xacro:include filename="$(find praca_mgr_lok_rob)/robot/materials.xacro" />
+  <xacro:include filename="$(find praca_mgr_lok_rob)/robot/robot.gazebo" />
+  <xacro:include filename="$(find praca_mgr_lok_rob)/robot/macros.xacro" />
   
   <link name="link_chassis">
     <!-- pose and inertial -->

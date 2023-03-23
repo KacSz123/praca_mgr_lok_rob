@@ -25,8 +25,8 @@ class ProbabLocalization():
     __rawdata = []
     __scan=[]
     
-    def __init__(self, nodeName="myNodeProbabLocalization", sectionsNumber = 8,sectionsNumberOrient = 8):
-        self.__sectionNumber = sectionsNumber
+    def __init__(self, nodeName="myNodeProbabLocalization", sectionsNumberLocalization = 8,sectionsNumberOrient = 8):
+        self.__sectionsNumberLocalization = sectionsNumberLocalization
         self.__sectionNumberOrient = sectionsNumberOrient
         rospy.init_node(nodeName)
 
@@ -79,10 +79,10 @@ class ProbabLocalization():
         localMin = np.argmin(scan)
         newScan =  scan[localMin:-1] + [scan[-1]]+scan[0:localMin]
         
-        perSection = (len(scan))//self.__sectionNumber
+        perSection = (len(scan))//self.__sectionsNumberLocalization
         currentProbList = []
         
-        for i in range(0, self.__sectionNumber):
+        for i in range(0, self.__sectionsNumberLocalization):
             currentList=[]
             
             for j in range(0, perSection):
@@ -103,7 +103,7 @@ class ProbabLocalization():
         diffList = []
         for i in self.__posMap:
             diff = 0
-            for j in range(0,self.__sectionNumber):
+            for j in range(0,self.__sectionsNumberLocalization):
                 diff+=abs((i[1][j][0]-tmpProbList[j][0])+(i[1][j][0]-tmpProbList[j][0]))
             diffList.append(diff)
         print("Punkt to:", self.__posMap[np.argmin(diffList)][0])
@@ -116,7 +116,7 @@ class ProbabLocalization():
         diffList = []
         for i in self.__posMap:
             diff = 0
-            for j in range(0,self.__sectionNumber):
+            for j in range(0,self.__sectionsNumberLocalization):
                 # diff+=abs((i[1][j][0]-tmpProbList[j][0])+(i[1][j][0]-tmpProbList[j][0]))
                 diff+=twoPointsSubstraction(i[1][j],tmpProbList[j])
             diffList.append(diff)
