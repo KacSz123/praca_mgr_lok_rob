@@ -1,4 +1,4 @@
-#from rospy_message_converter import json_message_converter
+#from rospy_message_converter import jsonsectionsNumber_message_converter
 import rospy
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
@@ -25,7 +25,7 @@ class ProbabLocalization():
     __rawdata = []
     __scan=[]
     
-    def __init__(self, nodeName="myNodeHistMap", sectionsNumber = 8,sectionsNumberOrient = 20):
+    def __init__(self, nodeName="myNodeProbabLocalization", sectionsNumber = 8,sectionsNumberOrient = 8):
         self.__sectionNumber = sectionsNumber
         self.__sectionNumberOrient = sectionsNumberOrient
         rospy.init_node(nodeName)
@@ -111,18 +111,18 @@ class ProbabLocalization():
     
     def locateRobotLocalMinimum(self):
         tmpscan=self.__scan
-        #print(tmpscan)
         tmpProbList = self.makeProbabDescrOneScanLocalMin(list(tmpscan))
         tmpOrientList = self.makeProbabDescrOneScanOrient(list(tmpscan))
         diffList = []
         for i in self.__posMap:
             diff = 0
             for j in range(0,self.__sectionNumber):
-                diff+=abs((i[1][j][0]-tmpProbList[j][0])+(i[1][j][0]-tmpProbList[j][0]))
+                # diff+=abs((i[1][j][0]-tmpProbList[j][0])+(i[1][j][0]-tmpProbList[j][0]))
+                diff+=twoPointsSubstraction(i[1][j],tmpProbList[j])
             diffList.append(diff)
         print("Punkt to:", self.__posMap[np.argmin(diffList)][0])
         
-        ############# orientacja
+        ############# orientation
         
         currentPoint = self.__orientMap[np.argmin(diffList)][1]
         copyCurrentPoint = currentPoint.copy()
@@ -140,7 +140,6 @@ class ProbabLocalization():
             diffOrient.append(sum)
             currentPoint.append(currentPoint.pop(0))
         orient = 0
-
 
         orient = math.radians(abs(np.argmin(diffOrient))*(360//self.__sectionNumberOrient))
         print("Orientacja!!!!!: ", orient)
@@ -171,13 +170,10 @@ def __main__():
     hm.initTopicConnection()
     time.sleep(0.1)
     hm.loadMapLocalMin(fileName)
-    #hm.MakeHistMap()
-    # hm.MakeOrientMap()
-    # hm.printHistMap()
-    # hm.locateRobot()
-    
     print('###############################')
-    # hm.printHistOrientMap()
     hm.locateRobotLocalMinimum()
+    print('###############################')
+
+
 if __name__ == "__main__":
     __main__()

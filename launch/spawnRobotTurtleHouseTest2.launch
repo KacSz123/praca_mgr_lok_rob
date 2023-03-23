@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find praca_mgr_lok_rob)/robot/robot.xacro'" />
+    
+    <arg name="x" default="-1"/>
+    <arg name="y" default="4"/>
+    <arg name="z" default="0.00"/>
+    
+    <node name="mybot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+          args="-urdf -param robot_description -model m2wr -x $(arg x) -y $(arg y) -z $(arg z)" />
+          
+</launch>

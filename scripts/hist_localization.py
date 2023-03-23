@@ -20,35 +20,21 @@ class HistMap():
     
     __map = []
     __orientMap = []
-   # __orientList = []
-    __degrees = []
     __rawdata = []
     __scan = []
-    __tmpHist = []
-    __tmpOrient = []
-    __scan_taken = True
     
-    def __init__(self, nodeName="myNodeHistMap"):
-        #rospy.Subscriber(topicName, LaserScan, self.callback)
-        # self.jsonData = open(fileName)
-        self.__degrees = [math.radians(i/2) for i in range(0,720)]
-        
+    def __init__(self, nodeName="myNodeHistLocalization"):
         rospy.init_node(nodeName)
     def loadMap(self,fileName):
         _scan = []
-        _orient = []
         _scango = []
         _pose = [0, 0, 0]
         json_data = open(fileName)
         data = json.load(json_data)
-        # print(len(data))
-        # input()
         _scan = []
         for j in range(0, len(data)):
             # Wczytanie skanu z pierwszego zestawu danych
-
             _scan = []
-            
             _scango = data[j]["scan"]
             _pose = data[j]["pose"]
             for i in range(0, len(_scango)):
@@ -70,9 +56,7 @@ class HistMap():
             self.__map.append((i[0], hist, binno, binsNumber, (0.0, 10.0)))
             
     def MakeOrientMap(self, b=20):
-        #print('len orient list ', len(self.__orientList))
         for scan in self.__rawdata:
-            #print(self.__rawdata)
             tmpOrientList=[]  
             for j in range(0,b):
                 sum = 0
@@ -103,26 +87,20 @@ class HistMap():
                         sum+=scan[len(scan)//b + b*j]
             print(counter)
             orientList.append(sum/(counter))
-        
-        
-        #hist,b2 =np.histogram(self.__tmpOrient, range=(0.0, 6.2831), bins=20)
         print(len(orientList))
         return orientList
     
     def locateRobot(self):
-        # print(self.__scan)
         print(len(self.__orientMap ))
         tmpscan = self.__scan
         hist1, b = np.histogram(tmpscan, range=(0.0, 10.0), bins=20)
         currentOrientList= self.generateOrientList(tmpscan)
-        # print(self.__tmpOrient)
         diffList = []
         for i in self.__map:
             diff = 0
             for j in range(0, 20):
                 diff += abs(i[1][j]-hist1[j])
             diffList.append(diff)
-            print('', diff)
         diffList = np.array(diffList)
         print('Przyblizone polozenie to:', self.__map[np.argmin(diffList)][0])
         
@@ -161,7 +139,6 @@ class HistMap():
 
     def callback(self,msg):
         self.__scan = msg.ranges
-# 3
     def printData(self):
         for i in self.__rawdata:
             print(i)
@@ -175,7 +152,7 @@ class HistMap():
             print('\n')
       
     
-    def initTopicConnection(self, topicName= '/m2wr/laser/scan' , nodeName ="MyNodeHistMap" ):
+    def initTopicConnection(self, topicName='/m2wr/laser/scan'):
         rospy.Subscriber(topicName, LaserScan, self.callback)
         
             

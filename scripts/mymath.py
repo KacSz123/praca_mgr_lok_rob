@@ -2,6 +2,8 @@ import numpy as np
 import math
 from scipy.stats import multivariate_normal
 
+def twoPointsSubstraction(a,b):
+    return abs((a[0]-b[0])+(a[1]-b[1]))
 
 def get_yaw_z_degrees(x,y,z,w):
     t3 = +2.0 * (w * z + x * y)
@@ -40,7 +42,7 @@ def GetMuSigmaFromEq(x):
     return mu_x, sigma_x
 
 
-    
+
     
 def RegLinp(x,y,xmi,ymi):
     sumU=0
