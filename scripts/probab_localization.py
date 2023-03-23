@@ -95,20 +95,6 @@ class ProbabLocalization():
         return currentProbList
 
 
-    
-    def locateRobotOrient(self):
-        tmpscan=self.__scan
-        tmpProbList = self.makeProbabDescrOneScanOrient(tmpscan)
-        #tmpProbList.sort()
-        diffList = []
-        for i in self.__posMap:
-            diff = 0
-            for j in range(0,self.__sectionsNumberLocalization):
-                diff+=abs((i[1][j][0]-tmpProbList[j][0])+(i[1][j][0]-tmpProbList[j][0]))
-            diffList.append(diff)
-        print("Punkt to:", self.__posMap[np.argmin(diffList)][0])
-    
-    
     def locateRobotLocalMinimum(self):
         tmpscan=self.__scan
         tmpProbList = self.makeProbabDescrOneScanLocalMin(list(tmpscan))
@@ -120,10 +106,8 @@ class ProbabLocalization():
                 # diff+=abs((i[1][j][0]-tmpProbList[j][0])+(i[1][j][0]-tmpProbList[j][0]))
                 diff+=twoPointsSubstraction(i[1][j],tmpProbList[j])
             diffList.append(diff)
-        print("Punkt to:", self.__posMap[np.argmin(diffList)][0])
-        
+        print("Selected point:", self.__posMap[np.argmin(diffList)][0])
         ############# orientation
-        
         currentPoint = self.__orientMap[np.argmin(diffList)][1]
         copyCurrentPoint = currentPoint.copy()
         sum=0
@@ -142,22 +126,16 @@ class ProbabLocalization():
         orient = 0
 
         orient = math.radians(abs(np.argmin(diffOrient))*(360//self.__sectionNumberOrient))
-        print("Orientacja!!!!!: ", orient)
+        print("\nOrientation: ", orient)
         #print(currentPoint)
 
     def callback(self,msg):
         self.__scan = msg.ranges
-# 3
     def printData(self):
         for i in self.__rawdata:
             print(i)
-
-      
-    
-    def initTopicConnection(self, topicName= '/m2wr/laser/scan'):
-        rospy.Subscriber(topicName, LaserScan, self.callback)
-        
-            
+    def initTopicConnection(self, topicName= '/myRobot/laser/scan'):
+        rospy.Subscriber(topicName, LaserScan, self.callback)        
     def exitTopicConnection(self):
         self.sub.unregister()
             
@@ -165,7 +143,7 @@ class ProbabLocalization():
 
 
 def __main__():
-    fileName = 'map11.json'
+    fileName = 'testMap.json'
     hm = ProbabLocalization()
     hm.initTopicConnection()
     time.sleep(0.1)

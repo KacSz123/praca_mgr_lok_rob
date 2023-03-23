@@ -1,7 +1,6 @@
 #from rospy_message_converter import json_message_converter
 import rospy
 from sensor_msgs.msg import LaserScan
-from nav_msgs.msg import Odometry
 from mymath import *
 import signal
 import time
@@ -152,7 +151,7 @@ class HistMap():
             print('\n')
       
     
-    def initTopicConnection(self, topicName='/m2wr/laser/scan'):
+    def initTopicConnection(self, topicName='/myRobot/laser/scan'):
         rospy.Subscriber(topicName, LaserScan, self.callback)
         
             
