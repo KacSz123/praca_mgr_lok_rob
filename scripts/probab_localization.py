@@ -25,7 +25,7 @@ class ProbabLocalization():
     __rawdata = []
     __scan=[]
     
-    def __init__(self, nodeName="myNodeProbabLocalization", sectionsNumberLocalization = 8,sectionsNumberOrient = 8):
+    def __init__(self, nodeName="Probabilistic_Localization", sectionsNumberLocalization = 8,sectionsNumberOrient = 8):
         self.__sectionsNumberLocalization = sectionsNumberLocalization
         self.__sectionNumberOrient = sectionsNumberOrient
         rospy.init_node(nodeName)

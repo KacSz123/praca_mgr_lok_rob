@@ -8,7 +8,7 @@ import numpy as np
 class mapCreation():
     def __init__(self, modelName='myRobot', startPose=(-4,1),filneName = 'testMap.json'):
         rospy.wait_for_service('/gazebo/set_model_state')
-        rospy.init_node('mappingNode')
+        rospy.init_node('Mapping')
         self.__fileName=filneName
         self.__mapList = []
         self.__set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)

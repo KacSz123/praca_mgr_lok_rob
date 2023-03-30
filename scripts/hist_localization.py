@@ -26,7 +26,7 @@ class HistMap():
     __rawdata = []
     __scan = []
 
-    def __init__(self, nodeName="myNodeHistLocalization"):
+    def __init__(self, nodeName="Histogram_Localization"):
         rospy.init_node(nodeName)
 
     def loadMap(self, fileName):
