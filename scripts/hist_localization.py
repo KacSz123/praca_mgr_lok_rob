@@ -25,9 +25,11 @@ class HistMap():
     __orientMap = []
     __rawdata = []
     __scan = []
-
-    def __init__(self, nodeName="Histogram_Localization"):
+    
+    def __init__(self, nodeName="Histogram_Localization",bins=20, orientSection=20):
         rospy.init_node(nodeName)
+        self.__binsNumber=bins
+        self.__orientSectionNumber=orientSection
 
     def loadMap(self, fileName):
         _scan = []
@@ -51,44 +53,43 @@ class HistMap():
             self.__orientMap.append(self.generateOrientList(_scango))
         self.MakeHistMap()
 
-    def MakeHistMap(self, binsNumber=20):
+    def MakeHistMap(self):
         for i in self.__rawdata:
             # print(len(i[1]))
             hist, binno = np.histogram(
-                i[1], range=(0.0, 10.0), bins=binsNumber)
-            self.__map.append((i[0], hist, binno, binsNumber, (0.0, 10.0)))
+                i[1], range=(0.0, 10.0), bins=self.__binsNumber)
+            self.__map.append((i[0], hist, binno, self.__binsNumber, (0.0, 10.0)))
 
-    def MakeOrientMap(self, b=20):
+    def MakeOrientMap(self):
         for scan in self.__rawdata:
             tmpOrientList = []
-            for j in range(0, b):
+            for j in range(0, self.__orientSectionNumber):
                 sum = 0
                 tmpOrientList = []
-                for i in range(0, len(scan[1])//b):
+                for i in range(0, len(scan[1])//self.__orientSectionNumber):
                     if (
-                        not math.isnan(scan[1][i + b*j])
-                        and not math.isinf(scan[1][i + b*j])
-
+                        not math.isnan(scan[1][i + self.__orientSectionNumber*j])
+                        and not math.isinf(scan[1][i + self.__orientSectionNumber*j])
                     ):
-                        sum += scan[1][i + b*j]
-                tmpOrientList.append(sum/(len(scan[1])//b))
+                        sum += scan[1][i + self.__orientSectionNumber*j]
+                tmpOrientList.append(sum/(len(scan[1])//self.__orientSectionNumber))
 
             self.__orientMap.append(tmpOrientList)
         # print(self.__orientMap)
 ###################################################
 
-    def generateOrientList(self, scan, sectionNr=20):
+    def generateOrientList(self, scan):
         orientList = []
-        for j in range(0, sectionNr):
+        for j in range(0, self.__orientSectionNumber):
             sum = 0
             counter = 0
-            for i in range(0, (len(scan)//sectionNr)):
+            for i in range(0, (len(scan)//self.__orientSectionNumber)):
                 if (
-                    not math.isnan(scan[i + sectionNr*j])
-                    and not math.isinf(scan[i + sectionNr*j])
+                    not math.isnan(scan[i + self.__orientSectionNumber*j])
+                    and not math.isinf(scan[i + self.__orientSectionNumber*j])
                 ):
                     counter += 1
-                    sum += scan[i + sectionNr*j]
+                    sum += scan[i + self.__orientSectionNumber*j]
             orientList.append(sum/(counter))
         return orientList
 #######################################################
@@ -96,12 +97,12 @@ class HistMap():
     def locateRobot(self):
         print(len(self.__scan))
         tmpscan = self.__scan
-        hist1, b = np.histogram(tmpscan, range=(0.0, 10.0), bins=20)
+        hist1, b = np.histogram(tmpscan, range=(0.0, 10.0), bins=self.__binsNumber)
         currentOrientList = self.generateOrientList(tmpscan)
         diffList = []
         for i in self.__map:
             diff = 0
-            for j in range(0, 20):
+            for j in range(0, self.__binsNumber):
                 diff += abs(i[1][j]-hist1[j])
             diffList.append(diff)
         diffList = np.array(diffList)
@@ -124,7 +125,7 @@ class HistMap():
             diffOrient.append(sum)
             copyCurrentList.append(copyCurrentList.pop(0))
 
-        orient = math.radians(abs(np.argmin(diffOrient))*(360//20))
+        orient = math.radians(abs(np.argmin(diffOrient))*(360//self.__binsNumber))
 
         print("Orientation: ", orient)
 
@@ -138,14 +139,14 @@ class HistMap():
     def printHistMap(self):
         for i in self.__map:
             print(i)
-            print('\n')
+        print('\n')
 
     def printHistOrientMap(self):
         for i in self.__orientMap:
             print(i)
-            print('\n')
+        print('\n')
 
-    def initTopicConnection(self, topicName='/myRobot/laser/scan'):
+    def initTopicConnection(self, topicName='/laser/scan'):
         rospy.Subscriber(topicName, LaserScan, self.callback)
 
     def exitTopicConnection(self):

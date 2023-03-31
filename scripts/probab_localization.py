@@ -19,13 +19,11 @@ def handler(signum, frame):
 signal.signal(signal.SIGINT, handler)
 
 class ProbabLocalization():
-    
-    __posMap = []
-    __orientMap = []
-    __rawdata = []
-    __scan=[]
-    
     def __init__(self, nodeName="Probabilistic_Localization", sectionsNumberLocalization = 8,sectionsNumberOrient = 8):
+        self.__posMap = []
+        self.__orientMap = []
+        self.__rawdata = []
+        self.__scan=[]
         self.__sectionsNumberLocalization = sectionsNumberLocalization
         self.__sectionNumberOrient = sectionsNumberOrient
         rospy.init_node(nodeName)
@@ -54,7 +52,6 @@ class ProbabLocalization():
             # Wczytanie skanu z pierwszego zestawu danych
             _scango = data[j]["scan"]
             _pose = data[j]["pose"]
-            
             self.__posMap.append((_pose, self.makeProbabDescrOneScanLocalMin(_scango)))
         #print(self.__posMap)
         
@@ -77,7 +74,6 @@ class ProbabLocalization():
     def makeProbabDescrOneScanLocalMin(self, scan):
         localMin = np.argmin(scan)
         newScan =  scan[localMin:-1] + [scan[-1]]+scan[0:localMin]
-        
         perSection = (len(scan))//self.__sectionsNumberLocalization
         currentProbList = []
         
@@ -102,7 +98,6 @@ class ProbabLocalization():
         for i in self.__posMap:
             diff = 0
             for j in range(0,self.__sectionsNumberLocalization):
-                # diff+=abs((i[1][j][0]-tmpProbList[j][0])+(i[1][j][0]-tmpProbList[j][0]))
                 diff+=twoPointsSubstraction(i[1][j],tmpProbList[j])
             diffList.append(diff)
         print("Selected point:", self.__posMap[np.argmin(diffList)][0])
@@ -132,7 +127,7 @@ class ProbabLocalization():
     def printData(self):
         for i in self.__rawdata:
             print(i)
-    def initTopicConnection(self, topicName= '/myRobot/laser/scan'):
+    def initTopicConnection(self, topicName= '/laser/scan'):
         rospy.Subscriber(topicName, LaserScan, self.callback)        
     def exitTopicConnection(self):
         self.sub.unregister()

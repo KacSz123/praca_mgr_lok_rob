@@ -29,13 +29,14 @@ class mapCreation():
         self.__state_msg.twist.angular.z=0
         self.__resp = self.__set_state( self.__state_msg )
 
-
         self.__scan = []
-        return
+        
+    
     def __setRobotPosition(self, position):
         self.__state_msg.pose.position.x = position[0]
         self.__state_msg.pose.position.y = position[1]
         self.__resp = self.__set_state( self.__state_msg )
+
     def writeMapToJsonFile(self, xRange, yRange, resolution=(0.5,0.5)):
         self.__mapList.clear()
         for i in np.arange(xRange[0],xRange[1],resolution[0]):
@@ -48,13 +49,15 @@ class mapCreation():
         jsonStr = json.dumps(self.__mapList)
         with open(self.__fileName, 'w') as f:
              json.dump(self.__mapList, f)
-        return
-    def initTopicConnection(self, topicName='/myRobot/laser/scan'):
+        
+    
+    def initTopicConnection(self, topicName='/laser/scan'):
         rospy.Subscriber(topicName, LaserScan, self.callback)
+        
     def callback(self,msg):
         self.__scan = msg.ranges
-        #print(self.__scan)
-def main():
+
+def __main__():
     myMap=mapCreation()
     myMap.initTopicConnection()
     myMap.writeMapToJsonFile((-4,-1),(3, 4.5))
@@ -63,6 +66,6 @@ def main():
 
 if __name__ == '__main__':
     try:
-        main()
+        __main__()
     except rospy.ROSInterruptException:
         pass
