@@ -19,7 +19,7 @@ def handler(signum, frame):
 signal.signal(signal.SIGINT, handler)
 
 
-class HistMap():
+class HistogramLocalization():
 
     __map = []
     __orientMap = []
@@ -154,8 +154,8 @@ class HistMap():
 
 
 def __main__():
-    fileName = 'testMap.json'
-    hm = HistMap()
+    fileName = './map/testMap.json'
+    hm = HistogramLocalization()
     hm.initTopicConnection()
     time.sleep(0.1)
     hm.loadMap(fileName)
@@ -167,7 +167,7 @@ def __main__():
     hm.locateRobot()
     print('\n###############################')
     # hm.printHistOrientMap()
-
+    rospy.spin()
 
 if __name__ == "__main__":
     __main__()

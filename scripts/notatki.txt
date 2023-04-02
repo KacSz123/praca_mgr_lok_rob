@@ -1,0 +1,25 @@
+###### mapowanie o wysokiej '?' rozdzielczosci willow garage
+
+pokoj z regalem 
+zasięg:
+        X = [4, 11.2]          Y = [-12, -4,5] resolution = (0.1 , 0.1)
+
+
+
+pokoj2 -- ze scietym rogiem
+zasięg:
+        X = [12.4, 14.1 ]          Y = [-8.3, -5.2] resolution = (0.1 , 0.1)
+
+
+pokoj 3 podłużny 
+zasięg:
+        X = [7.5, 13]          Y = [-15.1, -13.1] resolution = (0.1 , 0.1)
+
+
+korytarz prawo-dól
+zasięg:
+        X = [14.8, 28.4]          Y = [-15.1, -13.6] resolution = (0.1 , 0.1)
+
+
+
+#################

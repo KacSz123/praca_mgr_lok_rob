@@ -136,7 +136,7 @@ class ProbabLocalization():
 
 
 def __main__():
-    fileName = 'testMap.json'
+    fileName = './map/testMap.json'
     hm = ProbabLocalization()
     hm.initTopicConnection()
     time.sleep(0.1)
@@ -145,6 +145,7 @@ def __main__():
     hm.locateRobotLocalMinimum()
     print('###############################')
 
+    rospy.spin()
 
 if __name__ == "__main__":
     __main__()
