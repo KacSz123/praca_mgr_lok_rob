@@ -1,12 +1,13 @@
 import rospy 
 import json
+import pickle
 from gazebo_msgs.msg import ModelState 
 from gazebo_msgs.srv import SetModelState
 from sensor_msgs.msg import LaserScan
 import time
 import numpy as np
 class mapCreation():
-    def __init__(self, modelName='myRobot', startPose=(-4,1),fileName = 'testMap.json'):
+    def __init__(self, modelName='myRobot', startPose=(-4,1),fileName = 'testMap'):
         rospy.wait_for_service('/gazebo/set_model_state')
         rospy.init_node('Mapping')
         self.__fileName=fileName
@@ -46,10 +47,24 @@ class mapCreation():
                 time.sleep(0.3)
                 self.__mapList.append({"pose":[i,j,0],"scan":self.__scan})
         time.sleep(0.5)
-        jsonStr = json.dumps(self.__mapList)
-        with open(self.__fileName, 'w') as f:
+        #jsonStr = json.dumps(self.__mapList)
+        with open(self.__fileName+'.json', 'w') as f:
              json.dump(self.__mapList, f)
         print(1)
+
+    def writeMapToPickleFile(self, xRange, yRange, resolution=(0.5,0.5)):
+        print(1)
+        self.__mapList.clear()
+        for i in np.arange(xRange[0],xRange[1],resolution[0]):
+            for j in np.arange(yRange[0],yRange[1],resolution[1]):
+                self.__setRobotPosition((i,j))
+                time.sleep(0.3)
+                self.__mapList.append({"pose":[i,j,0],"scan":self.__scan})
+        time.sleep(0.5)
+        name=self.__fileName+'.pkl'
+        with open(name, 'wb') as f:
+             pickle.dump(self.__mapList, f)
+
 
     def initTopicConnection(self, topicName='/laser/scan'):
         rospy.Subscriber(topicName, LaserScan, self.callback)
