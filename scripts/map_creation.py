@@ -6,6 +6,7 @@ from gazebo_msgs.srv import SetModelState
 from sensor_msgs.msg import LaserScan
 import time
 import numpy as np
+import random
 class mapCreation():
     def __init__(self, modelName='myRobot', startPose=(-4,1),fileName = 'testMap'):
         rospy.wait_for_service('/gazebo/set_model_state')
@@ -65,6 +66,30 @@ class mapCreation():
         with open(name, 'wb') as f:
              pickle.dump(self.__mapList, f)
 
+
+    def getRandomPointsToPickle(self, xRange, yRange, number=1000, precision=1):
+        pointsList=[]
+        while len(pointsList)<number:
+            randX=round(random.uniform(xRange[0], xRange[1]), precision)
+            randY=round(random.uniform(yRange[0], yRange[1]), precision)
+            if (randX,randY) not in pointsList:
+                pointsList.append((randX,randY))
+        print(1)
+        self.__mapList.clear()
+        for i in pointsList:
+                print(i)
+                self.__setRobotPosition(i)
+                time.sleep(0.3)
+                self.__mapList.append({"pose":[i[0],i[1],0],"scan":self.__scan})
+        time.sleep(0.5)
+        #jsonStr = json.dumps(self.__mapList)
+        with open(self.__fileName+'.pkl', 'wb') as f:
+             pickle.dump(self.__mapList, f)
+        # print(len(pointsList))
+        # print(pointsList)
+
+    def getRandomPointsToJson():
+        return
 
     def initTopicConnection(self, topicName='/laser/scan'):
         rospy.Subscriber(topicName, LaserScan, self.callback)
