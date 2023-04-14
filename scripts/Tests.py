@@ -15,10 +15,10 @@ def writeMapTofilePickle(name):
 
 def writeTestPointsToPickle():
 
-    mfileName = 'random1000points'
-    mapCreator = mapCreation(startPose=(12.4,-8.3), fileName=MAP_DIR+mfileName)
+    mfileName = 'random1000points-corridor'
+    mapCreator = mapCreation(startPose=(12.4,-8.3), fileName=TEST_POINTS_DIR+mfileName)
     mapCreator.initTopicConnection()
-    mapCreator.getRandomPointsToPickle(xRange=(4, 11.2),yRange=(-12, -4.5))
+    mapCreator.getRandomPointsToPickle(xRange=(14.8, 28.4),yRange=(-15.1, -13.6))
 def __main__():
     writeTestPointsToPickle()
     # writeMapTofileJson('mapRoomWithShelf-res01')
