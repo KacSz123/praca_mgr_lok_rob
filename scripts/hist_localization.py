@@ -5,10 +5,12 @@ from mymath import *
 import signal
 import time
 import json
+import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 ###################################
-
+def twoPointsDist(a,b):
+    return math.sqrt(pow(a[0]-b[0],2)+pow(a[1]-b[1],2))
 
 def handler(signum, frame):
     res = input("\n\nCtrl-c was pressed. Do you really want to exit? y/n ")
@@ -31,12 +33,35 @@ class HistogramLocalization():
         self.__binsNumber=bins
         self.__orientSectionNumber=orientSection
 
-    def loadMap(self, fileName):
+    def loadMapJson(self, fileName):
         _scan = []
         _scango = []
         _pose = [0, 0, 0]
         json_data = open(fileName)
         data = json.load(json_data)
+        _scan = []
+        for j in range(0, len(data)):
+            # Wczytanie skanu z pierwszego zestawu danych
+            _scan = []
+            _scango = data[j]["scan"]
+            _pose = data[j]["pose"]
+            for i in range(0, len(_scango)):
+                if (
+                    not math.isnan(_scango[i])
+                    and not math.isinf(_scango[i])
+                ):
+                    _scan.append(_scango[i])
+            self.__rawdata.append((_pose, _scan))
+            self.__orientMap.append(self.generateOrientList(_scango))
+        self.MakeHistMap()
+
+    def loadMapPickle(self, fileName):
+        _scan = []
+        _scango = []
+        _pose = [0, 0, 0]
+        #json_data = open(fileName)
+        with open(fileName, 'rb') as f:
+            data = pickle.load(f)
         _scan = []
         for j in range(0, len(data)):
             # Wczytanie skanu z pierwszego zestawu danych
@@ -90,7 +115,11 @@ class HistogramLocalization():
                 ):
                     counter += 1
                     sum += scan[i + self.__orientSectionNumber*j]
-            orientList.append(sum/(counter))
+            if counter != 0:
+                orientList.append(sum/(counter))
+            else:
+                orientList.append(0)
+
         return orientList
 #######################################################
 
@@ -124,11 +153,43 @@ class HistogramLocalization():
                 sum += abs(tmpOrient[i]-copyCurrentList[i])
             diffOrient.append(sum)
             copyCurrentList.append(copyCurrentList.pop(0))
-
         orient = math.radians(abs(np.argmin(diffOrient))*(360//self.__binsNumber))
-
         print("Orientation: ", orient)
+        return {"point":self.__map[np.argmin(diffList)][0],"orientation":orient}
 
+    def locateRobotScan(self,scanT):
+        #print(len(self.__scan))
+        tmpscan = scanT
+        hist1, b = np.histogram(tmpscan, range=(0.0, 10.0), bins=self.__binsNumber)
+        currentOrientList = self.generateOrientList(tmpscan)
+        diffList = []
+        for i in self.__map:
+            diff = 0
+            for j in range(0, self.__binsNumber):
+                diff += abs(i[1][j]-hist1[j])
+            diffList.append(diff)
+        diffList = np.array(diffList)
+        # print('Selected point:', self.__map[np.argmin(diffList)][0])
+        # orientation
+        tmpOrient = self.__orientMap[np.argmin(diffList)].copy()
+        copyCurrentList = currentOrientList.copy()
+        diffOrient = []
+
+        sum = 0
+        for i in range(0, len(tmpOrient)):
+            sum += abs(tmpOrient[i]-copyCurrentList[i])
+        diffOrient.append(sum)
+        copyCurrentList.append(copyCurrentList.pop(0))
+
+        while currentOrientList != copyCurrentList:
+            sum = 0
+            for i in range(0, len(copyCurrentList)):
+                sum += abs(tmpOrient[i]-copyCurrentList[i])
+            diffOrient.append(sum)
+            copyCurrentList.append(copyCurrentList.pop(0))
+        orient = math.radians(abs(np.argmin(diffOrient))*(360//self.__binsNumber))
+        # print("Orientation: ", orient)
+        return {"point":self.__map[np.argmin(diffList)][0],"orientation":orient}
     def callback(self, msg):
         self.__scan = msg.ranges
 
@@ -153,21 +214,21 @@ class HistogramLocalization():
         self.sub.unregister()
 
 
-def __main__():
-    fileName = './map/testMap.json'
-    hm = HistogramLocalization()
-    hm.initTopicConnection()
-    time.sleep(0.1)
-    hm.loadMap(fileName)
-    # hm.MakeHistMap()
-    # hm.MakeOrientMap()
-    # hm.printHistMap()
+# def __main__():
+#     # fileName = './map/testMap.json'
+#     # hm = HistogramLocalization()
+#     # hm.initTopicConnection()
+#     # time.sleep(0.1)
+#     # hm.loadMap(fileName)
+#     # # hm.MakeHistMap()
+#     # # hm.MakeOrientMap()
+#     # # hm.printHistMap()
 
-    print('###############################\n')
-    hm.locateRobot()
-    print('\n###############################')
-    # hm.printHistOrientMap()
-    rospy.spin()
+#     # print('###############################\n')
+#     # hm.locateRobot()
+#     # print('\n###############################')
+#     # # hm.printHistOrientMap()
+#     # rospy.spin()
 
-if __name__ == "__main__":
-    __main__()
+# if __name__ == "__main__":
+#     __main__()
