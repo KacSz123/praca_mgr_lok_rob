@@ -29,3 +29,27 @@ zasięg:
         return
     def makeRandomPointsToJson():
         return
+
+Pandas opis:
+Total number of entries
+mean	Average of all the entries
+std	standard deviation
+min	minimum value
+25%	25 percentile mark
+50%	50 percentile mark (median)
+75%	75 percentile mark
+max	maximum value 
+############## wyniki pokoj z polkami jhistogram 	
+
+
+count    1.000000e+03
+mean     4.008360e-02
+std      5.147312e-01
+min      0.000000e+00
+25%      1.445850e-14
+50%      2.132553e-14
+75%      2.576100e-14
+max      7.611833e+00
+
+
+

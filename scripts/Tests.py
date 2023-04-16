@@ -3,6 +3,7 @@ from hist_localization import HistogramLocalization
 import pickle
 import mymath
 import math
+import pandas as pd
 def twoPointsDist(a,b):
     return math.sqrt(pow(a[0]-b[0],2)+pow(a[1]-b[1],2))
 MAP_DIR = './map/'
@@ -42,6 +43,12 @@ def histLocalizationTest():
     print(errorList)
     with open(RESULTS_DIR+'histLocalShelf1000.pkl', 'wb') as f:
         pickle.dump(errorList, f)
+def generateStatistics():
+    with open('./results/histLocalShelf1000.pkl', 'rb') as f:
+        data = pickle.load(f)
+    # print(data)
+    s=pd.Series(data)
+    print(s.describe())
 def histOrientationTest():
     return
 def probabLocalizationTest():
@@ -50,7 +57,8 @@ def probabOrientationTest():
     return
 
 def __main__():
-    histLocalizationTest()
+    generateStatistics()
+    # histLocalizationTest()
     #writeTestPointsToPickle()
     # writeMapTofileJson('mapRoomWithShelf-res01')
     #writeMapTofilePickle('mapRoomWithShelf-res01')

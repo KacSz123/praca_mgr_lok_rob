@@ -8,7 +8,7 @@ import time
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-import operator
+import pickle
 
 ###################################
 def handler(signum, frame):
@@ -29,7 +29,7 @@ class ProbabLocalization():
         rospy.init_node(nodeName)
 
 
-    def loadMapOrient(self,fileName):
+    def loadMapOrientJson(self,fileName):
         _scango = []
         _pose = [0, 0, 0]
         json_data = open(fileName)
@@ -41,8 +41,33 @@ class ProbabLocalization():
             
             self.__orientMap.append((_pose, self.makeProbabDescrOneScanOrient(_scango)))
         #print(self.__orientMap)
+    def loadMapOrientPickle(self,fileName):
+        _scango = []
+        _pose = [0, 0, 0]
+        
+        with open(fileName, 'rb') as f:
+            data = pickle.load(f)
+        for j in range(0, len(data)):
+            # Wczytanie skanu z pierwszego zestawu danych
+            _scango = data[j]["scan"]
+            _pose = data[j]["pose"]
+            
+            self.__orientMap.append((_pose, self.makeProbabDescrOneScanOrient(_scango)))
+        #print(self.__orientMap)
+
+    def loadMapOrientPickle(self,fileName):
+        _scango = []
+        _pose = [0, 0, 0]
+        with open(fileName, 'rb') as f:
+            data = pickle.load(f)
+        for j in range(0, len(data)):
+            # Wczytanie skanu z pierwszego zestawu danych
+            _scango = data[j]["scan"]
+            _pose = data[j]["pose"]
+            self.__orientMap.append((_pose, self.makeProbabDescrOneScanOrient(_scango)))
+        #print(self.__orientMap)
     def loadMapLocalMin(self,fileName):
-        self.loadMapOrient(fileName)
+        self.loadMapOrientJson(fileName)
         _scan = []
         _scango = []
         _pose = [0, 0, 0]
@@ -68,7 +93,10 @@ class ProbabLocalization():
                         and not math.isinf(scan[i*perSection+j])
                     ):
                         currentList.append(scan[i*perSection+j])
-            currentProbList.append((GetMuSigmaFromEqSqrt(currentList)))
+            if len(currentList)!=0:
+                currentProbList.append((GetMuSigmaFromEqSqrt(currentList)))
+            else:
+                currentProbList.append((0.0,0.0))
         return currentProbList
 
     def makeProbabDescrOneScanLocalMin(self, scan):
