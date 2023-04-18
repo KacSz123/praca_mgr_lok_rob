@@ -2,7 +2,7 @@
 
 pokoj z regalem 
 zasięg:
-        X = [4, 11.2]          Y = [-12, -4,5] resolution = (0.1 , 0.1)
+        X = [4, 11.2]          Y = [-12, -4.6] resolution = (0.1 , 0.1)
 
 
 
@@ -54,3 +54,90 @@ max      7.611833e+00
 
 
 ######
+
+################################## hist dla losowanego punktu z precyzją 2miejsc, 20koszy-local i 20 przedziałów - orient
+localization
+count    1000.000000
+mean        0.178190
+std         0.422826
+min         0.000000
+25%         0.050000
+50%         0.150000
+75%         0.250000
+max         7.000000
+dtype: float64
+orientation
+count    1000.000000
+mean        2.700030
+std         1.713910
+min         0.000000
+25%         1.247433
+50%         2.456283
+75%         4.061128
+max         6.280000
+dtype: float64
+################################## hist dla losowanego punktu z precyzją 2miejsc, 10koszy-local i 10 przedziałów - orient
+localization
+count    1000.000000
+mean        0.191310
+std         0.478088
+min         0.000000
+25%         0.050000
+50%         0.150000
+75%         0.260000
+max         7.000000
+dtype: float64
+orientation
+count    1000.000000
+mean        2.484794
+std         1.646410
+min         0.000000
+25%         1.069181
+50%         2.266681
+75%         3.599557
+max         6.280000
+dtype: float64
+################################## hist dla losowanego punktu z precyzją 2miejsc, 15koszy-local i 25 przedziałów - orient
+localization
+count    1000.000000
+mean        0.157970
+std         0.113205
+min         0.000000
+25%         0.050000
+50%         0.150000
+75%         0.260000
+max         0.900000
+dtype: float64
+orientation
+count    1000.000000
+mean        3.991887
+std         2.725949
+min         0.000000
+25%         1.675325
+50%         3.832625
+75%         5.850943
+max         9.963096
+dtype: float64
+
+################################## hist dla losowanego punktu z precyzją 2miejsc, 30koszy-local i 25 przedziałów - orient
+
+localization
+count    1000.000000
+mean        0.161830
+std         0.244884
+min         0.000000
+25%         0.050000
+50%         0.150000
+75%         0.250000
+max         7.100000
+dtype: float64
+orientation
+count    1000.000000
+mean        2.611551
+std         1.721695
+min         0.000000
+25%         1.166586
+50%         2.349911
+75%         3.993363
+max         6.280000
+dtype: float64

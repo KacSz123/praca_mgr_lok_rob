@@ -9,8 +9,8 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 ###################################
-def twoPointsDist(a,b):
-    return math.sqrt(pow(a[0]-b[0],2)+pow(a[1]-b[1],2))
+# def twoPointsDist(a,b):
+#     return math.sqrt(pow(a[0]-b[0],2)+pow(a[1]-b[1],2))
 
 def handler(signum, frame):
     res = input("\n\nCtrl-c was pressed. Do you really want to exit? y/n ")
@@ -190,6 +190,8 @@ class HistogramLocalization():
         orient = math.radians(abs(np.argmin(diffOrient))*(360//self.__binsNumber))
         # print("Orientation: ", orient)
         return {"point":self.__map[np.argmin(diffList)][0],"orientation":orient}
+    
+    
     def callback(self, msg):
         self.__scan = msg.ranges
 

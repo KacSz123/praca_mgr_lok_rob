@@ -57,7 +57,7 @@ class ProbabLocalization():
 
     def loadMapOrientPickle(self,fileName):
         _scango = []
-        _pose = [0, 0, 0]
+        _pose = [0, 0, 0] #pose x,y, alpha=
         with open(fileName, 'rb') as f:
             data = pickle.load(f)
         for j in range(0, len(data)):
