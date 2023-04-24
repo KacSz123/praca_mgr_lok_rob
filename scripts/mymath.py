@@ -24,11 +24,17 @@ def GetMuSigmaFromEqSqrt(x):
     suma=0
     for i in x:
         suma = suma + i
-    mu_x=sum(x)/len(x)
+    if len(x)!=0:
+        mu_x=sum(x)/len(x)
+    else:
+        mu_x=0
     suma=0
     for i in x:
         suma = suma + (i-mu_x)*(i-mu_x)
-    sigma_x=suma/len(x)
+    if len(x)!=0:
+        sigma_x=sum(x)/len(x)     
+    else:
+        sigma_x=0
     return mu_x, math.sqrt(sigma_x)
         
 def GetMuSigmaFromEq(x):

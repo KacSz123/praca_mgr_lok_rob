@@ -55,17 +55,6 @@ class ProbabLocalization():
             self.__orientMap.append((_pose, self.makeProbabDescrOneScanOrient(_scango)))
         #print(self.__orientMap)
 
-    def loadMapOrientPickle(self,fileName):
-        _scango = []
-        _pose = [0, 0, 0] #pose x,y, alpha=
-        with open(fileName, 'rb') as f:
-            data = pickle.load(f)
-        for j in range(0, len(data)):
-            # Wczytanie skanu z pierwszego zestawu danych
-            _scango = data[j]["scan"]
-            _pose = data[j]["pose"]
-            self.__orientMap.append((_pose, self.makeProbabDescrOneScanOrient(_scango)))
-        #print(self.__orientMap)
     def loadMapLocalMin(self,fileName):
         self.loadMapOrientJson(fileName)
         _scan = []
@@ -80,6 +69,21 @@ class ProbabLocalization():
             self.__posMap.append((_pose, self.makeProbabDescrOneScanLocalMin(_scango)))
         #print(self.__posMap)
         
+
+    def loadMapLocalMinPickle(self,fileName):
+        self.loadMapOrientPickle(fileName)
+        _scango = []
+        _pose = []
+        with open(fileName, 'rb') as f:
+            data = pickle.load(f)
+        for j in range(0, len(data)):
+            # Wczytanie skanu z pierwszego zestawu danych
+            _scango = list(data[j]["scan"])
+            _pose = data[j]["pose"]
+            self.__posMap.append((_pose, self.makeProbabDescrOneScanLocalMin(_scango)))
+
+
+
 
     def makeProbabDescrOneScanOrient(self, scan):
         perSection = (len(scan))//self.__sectionNumberOrient
@@ -100,6 +104,8 @@ class ProbabLocalization():
         return currentProbList
 
     def makeProbabDescrOneScanLocalMin(self, scan):
+    #     print(type(scan))
+    #     print(len(scan))
         localMin = np.argmin(scan)
         newScan =  scan[localMin:-1] + [scan[-1]]+scan[0:localMin]
         perSection = (len(scan))//self.__sectionsNumberLocalization
@@ -118,8 +124,13 @@ class ProbabLocalization():
         return currentProbList
 
 
-    def locateRobotLocalMinimum(self):
-        tmpscan=self.__scan
+    def locateRobotLocalMinimum(self,fileScan=None):
+        tmpscan=[]
+        if fileScan == None:
+            tmpscan = self.__scan
+        elif fileScan!=None:
+            tmpscan = list(fileScan)
+        # print(isinstance(tmpscan,list))
         tmpProbList = self.makeProbabDescrOneScanLocalMin(list(tmpscan))
         tmpOrientList = self.makeProbabDescrOneScanOrient(list(tmpscan))
         diffList = []
@@ -128,7 +139,7 @@ class ProbabLocalization():
             for j in range(0,self.__sectionsNumberLocalization):
                 diff+=twoPointsSubstraction(i[1][j],tmpProbList[j])
             diffList.append(diff)
-        print("Selected point:", self.__posMap[np.argmin(diffList)][0])
+        # print("Selected point:", self.__posMap[np.argmin(diffList)][0])
         ############# orientation
         currentPoint = self.__orientMap[np.argmin(diffList)][1]
         copyCurrentPoint = currentPoint.copy()
@@ -146,8 +157,9 @@ class ProbabLocalization():
             diffOrient.append(sum)
             currentPoint.append(currentPoint.pop(0))
         orient = 0
-        orient = math.radians(abs(np.argmin(diffOrient))*(360//self.__sectionNumberOrient))
-        print("\nOrientation: ", orient)
+        print(orient)
+        orient = math.radians(np.argmin(diffOrient)*(360//self.__sectionNumberOrient))
+        return self.__posMap[np.argmin(diffList)][0], orient
         #print(currentPoint)
 
     def callback(self,msg):
@@ -163,17 +175,17 @@ class ProbabLocalization():
             
 
 
-def __main__():
-    fileName = './map/testMap.json'
-    hm = ProbabLocalization()
-    hm.initTopicConnection()
-    time.sleep(0.1)
-    hm.loadMapLocalMin(fileName)
-    print('###############################')
-    hm.locateRobotLocalMinimum()
-    print('###############################')
+# def __main__():
+#     fileName = './map/testMap.json'
+#     hm = ProbabLocalization()
+#     hm.initTopicConnection()
+#     time.sleep(0.1)
+#     hm.loadMapLocalMin(fileName)
+#     print('###############################')
+#     hm.locateRobotLocalMinimum()
+#     print('###############################')
 
-    rospy.spin()
+#     rospy.spin()
 
-if __name__ == "__main__":
-    __main__()
+# if __name__ == "__main__":
+#     __main__()

@@ -1,5 +1,5 @@
 ###### mapowanie o wysokiej '?' rozdzielczosci willow garage
-
+#######################################################################################
 pokoj z regalem 
 zasięg:
         X = [4, 11.2]          Y = [-12, -4.6] resolution = (0.1 , 0.1)
@@ -22,14 +22,9 @@ zasięg:
 
 
 
-#################
+########################################################################################
 
-
-    def makeRandomPointsToPickle():
-        return
-    def makeRandomPointsToJson():
-        return
-
+########################################################################################
 Pandas opis:
 Total number of entries
 mean	Average of all the entries
@@ -55,89 +50,114 @@ max      7.611833e+00
 
 ######
 
-################################## hist dla losowanego punktu z precyzją 2miejsc, 20koszy-local i 20 przedziałów - orient
+ hist                   probab          dla losowanego punktu z precyzją 2miejsc, 20koszy-local i 20 przedziałów - orient
 localization
-count    1000.000000
-mean        0.178190
-std         0.422826
-min         0.000000
-25%         0.050000
-50%         0.150000
-75%         0.250000
-max         7.000000
+count    1000.000000    count    1000.000000
+mean        0.178190    mean        0.170250
+std         0.422826    std         0.122764
+min         0.000000    min         0.000000
+25%         0.050000    25%         0.060000
+50%         0.150000    50%         0.150000
+75%         0.250000    75%         0.260000
+max         7.000000    max         0.900000
 dtype: float64
 orientation
-count    1000.000000
-mean        2.700030
-std         1.713910
-min         0.000000
-25%         1.247433
-50%         2.456283
-75%         4.061128
-max         6.280000
+count    1000.000000   count    1000.000000
+mean        2.700030   mean        0.267664
+std         1.713910   std         1.060941
+min         0.000000   min         0.000000
+25%         1.247433   25%         0.038319
+50%         2.456283   50%         0.078363
+75%         4.061128   75%         0.119115
+max         6.280000   max         6.280000
 dtype: float64
-################################## hist dla losowanego punktu z precyzją 2miejsc, 10koszy-local i 10 przedziałów - orient
+hist                   probab                      10koszy-local probab - przedzialow;  10 przedziałów - orient z precyzją 2miejsc
 localization
-count    1000.000000
-mean        0.191310
-std         0.478088
-min         0.000000
-25%         0.050000
-50%         0.150000
-75%         0.260000
-max         7.000000
+count    1000.000000   count    count    1000.000000 
+mean        0.191310   mean     mean        0.171590
+std         0.478088   std      std         0.123989
+min         0.000000   min      min         0.000000
+25%         0.050000   25%      25%         0.060000
+50%         0.150000   50%      50%         0.150000
+75%         0.260000   75%      75%         0.260000
+max         7.000000   max      max         0.660000
 dtype: float64
 orientation
-count    1000.000000
-mean        2.484794
-std         1.646410
-min         0.000000
-25%         1.069181
-50%         2.266681
-75%         3.599557
-max         6.280000
+count    1000.000000   count    count    1000.000000
+mean        2.484794   mean     mean        0.561644
+std         1.646410   std      std         1.487147
+min         0.000000   min      min         0.000000
+25%         1.069181   25%      25%         0.083452
+50%         2.266681   50%      50%         0.161726
+75%         3.599557   75%      75%         0.264956
+max         6.280000   max      max         6.280000
 dtype: float64
-################################## hist dla losowanego punktu z precyzją 2miejsc, 15koszy-local i 25 przedziałów - orient
+hist                        probab        dla losowanego punktu z precyzją 2miejsc, 15koszy-local i 25 przedziałów - orient
 localization
-count    1000.000000
-mean        0.157970
-std         0.113205
-min         0.000000
-25%         0.050000
-50%         0.150000
-75%         0.260000
-max         0.900000
+count    1000.000000        count    1000.000000
+mean        0.157970        mean        0.170250
+std         0.113205        std         0.122764
+min         0.000000        min         0.000000
+25%         0.050000        25%         0.060000
+50%         0.150000        50%         0.150000
+75%         0.260000        75%         0.260000
+max         0.900000        max         0.900000
 dtype: float64
 orientation
-count    1000.000000
-mean        3.991887
-std         2.725949
-min         0.000000
-25%         1.675325
-50%         3.832625
-75%         5.850943
-max         9.963096
+count    1000.000000       count    1000.000000            
+mean        3.991887       mean        0.267664
+std         2.725949       std         1.060941
+min         0.000000       min         0.000000
+25%         1.675325       25%         0.038319
+50%         3.832625       50%         0.078363
+75%         5.850943       75%         0.119115
+max         9.963096       max         6.280000
 dtype: float64
 
-################################## hist dla losowanego punktu z precyzją 2miejsc, 30koszy-local i 25 przedziałów - orient
+hist                      probab dla losowanego punktu z precyzją 2miejsc, 30koszy-local i 25 przedziałów - orient
 
-localization
-count    1000.000000
-mean        0.161830
-std         0.244884
-min         0.000000
-25%         0.050000
-50%         0.150000
-75%         0.250000
-max         7.100000
+localization            
+count    1000.000000   
+mean        0.161830   
+std         0.244884   
+min         0.000000   
+25%         0.050000   
+50%         0.150000   
+75%         0.250000   
+max         7.100000   
+dtype: float64          
+orientation             
+count    1000.000000   
+mean        2.611551   
+std         1.721695   
+min         0.000000   
+25%         1.166586   
+50%         2.349911   
+75%         3.993363   
+max         6.280000   
 dtype: float64
-orientation
-count    1000.000000
-mean        2.611551
-std         1.721695
-min         0.000000
-25%         1.166586
-50%         2.349911
-75%         3.993363
-max         6.280000
-dtype: float64
+#####################################################################################################>
+################# Metoda rozkładu normalnego
+#####################################################################################################>
+
+
+
+localization hist         probab              5local 5orient
+count    1000.000000        count    1000.000000
+mean        0.324690        mean        0.170250
+std         0.770185        std         0.122764
+min         0.000000        min         0.000000
+25%         0.060000        25%         0.060000
+50%         0.170000        50%         0.150000
+75%         0.280000        75%         0.260000
+max         6.940000        max         0.900000
+dtype: float64                   dtype: float64
+orientation                    orientation
+count    1000.000000        count    1000.000000
+mean        2.776756        mean        0.267664
+std         1.845311        std         1.060941
+min         0.020000        min         0.000000
+25%         1.163341        25%         0.038319
+50%         2.658363        50%         0.078363
+75%         4.280841        75%         0.119115
+max         6.280000        max         6.280000

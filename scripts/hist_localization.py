@@ -52,7 +52,7 @@ class HistogramLocalization():
                 ):
                     _scan.append(_scango[i])
             self.__rawdata.append((_pose, _scan))
-            self.__orientMap.append(self.generateOrientList(_scango))
+            self.__orientMap.append(self.generateOrientList(list(_scango)))
         self.MakeHistMap()
 
     def loadMapPickle(self, fileName):
