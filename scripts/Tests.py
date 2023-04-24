@@ -78,18 +78,18 @@ def probabLocalizationOrientationTest():
         orientErrList.append((abs(o-i["pose"][2])))
     #print(errorList)
     print(orientErrList)
-    with open(RESULTS_DIR+'probab-Shelf-1000pts-local-p2-sec30.pkl', 'wb') as f:
+    with open(RESULTS_DIR+'probab-Shelf-1000pts-local-p2-sec30b.pkl', 'wb') as f:
         pickle.dump(errorList, f)
-    with open(RESULTS_DIR+'probab-Shelf-1000pts-orient-p2-sec30.pkl', 'wb') as f:
+    with open(RESULTS_DIR+'probab-Shelf-1000pts-orient-p2-sec30b.pkl', 'wb') as f:
         pickle.dump(orientErrList, f)
 
 def generateStatisticsProbab():
-    with open('./results/probab-Shelf-1000pts-local-p2-sec30.pkl', 'rb') as f:
+    with open('./results/probab-Shelf-1000pts-local-p2-sec30b.pkl', 'rb') as f:
         data = pickle.load(f)
     s=pd.Series(data)
     print("localization")
     print(s.describe())
-    with open('./results/probab-Shelf-1000pts-orient-p2-sec30.pkl', 'rb') as f:
+    with open('./results/probab-Shelf-1000pts-orient-p2-sec30b.pkl', 'rb') as f:
         data2 = pickle.load(f)
     s2=pd.Series(data2)
     print("orientation")
