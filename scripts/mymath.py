@@ -4,7 +4,7 @@ from scipy.stats import multivariate_normal
 def twoPointsDist(a,b):
     return math.sqrt(pow(a[0]-b[0],2)+pow(a[1]-b[1],2))
 def twoPointsSubstraction(a,b):
-    return abs((a[0]-b[0])+(a[1]-b[1]))
+    return abs((a[0]-b[0])**2+(a[1]-b[1])**2)
 
 def get_yaw_z_degrees(x,y,z,w):
     t3 = +2.0 * (w * z + x * y)

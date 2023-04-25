@@ -32,7 +32,7 @@ def writeTestPointsToPickle():
 def histLocalizationTest():
     errorList = []
     orientErrList = []
-    hm=HistogramLocalization(bins=30,orientSection=30)
+    hm=HistogramLocalization(bins=30,orientSection=5)
     with open('./test-points/rand-1000pts-w-orient-p2.pkl', 'rb') as f:
         data = pickle.load(f)
     mapFile = './map/mapRoomWithShelf-res01.pkl'
@@ -45,17 +45,17 @@ def histLocalizationTest():
         orientErrList.append(abs(p["orientation"]-i["pose"][2]))
 
     #print(errorList)
-    with open(RESULTS_DIR+'hist-Shelf-1000pts-local-p2-bins30.pkl', 'wb') as f:
+    with open(RESULTS_DIR+'hist-debug-local.pkl', 'wb') as f:
         pickle.dump(errorList, f)
-    with open(RESULTS_DIR+'hist-Shelf-1000pts-orient-p2-sec30.pkl', 'wb') as f:
+    with open(RESULTS_DIR+'hist-debug-orient.pkl', 'wb') as f:
         pickle.dump(orientErrList, f)
 def generateStatisticsHist():
-    with open('./results/hist-Shelf-1000pts-local-p2-bins30.pkl', 'rb') as f:
+    with open('./results/hist-debug-local.pkl', 'rb') as f:
         data = pickle.load(f)
     s=pd.Series(data)
     print("localization")
     print(s.describe())
-    with open('./results/hist-Shelf-1000pts-orient-p2-sec30.pkl', 'rb') as f:
+    with open('./results/hist-debug-orient.pkl', 'rb') as f:
         data2 = pickle.load(f)
     s2=pd.Series(data2)
     print("orientation")
@@ -101,20 +101,11 @@ def showHistFromFile():
     x=np.array(data)
     plt.hist(x)
 def __main__():
-    probabLocalizationOrientationTest()
-    # histLocalizationTest()
-    # writeTestPointsToPickle()
-    # histLocalizationTest()
-    # generateStatisticsHist()
-    generateStatisticsProbab()
-#     fileName = './map/testMap.json'
-#     hm = ProbabLocalization()
-#     hm.initTopicConnection()
-#     time.sleep(0.1)
-#     hm.loadMapLocalMin(fileName)
-#     print('###############################')
-#     hm.locateRobotLocalMinimum()
-#     print('###############################')
+    # probabLocalizationOrientationTest()
+    # generateStatisticsProbab()
+    histLocalizationTest()
+    generateStatisticsHist()
+
 
 if __name__ == "__main__":
     __main__()

@@ -103,7 +103,7 @@ class ProbabLocalization():
                 currentProbList.append((0.0,0.0))
         return currentProbList
 
-    def makeProbabDescrOneScanLocalMin(self, scan):
+    def  makeProbabDescrOneScanLocalMin(self, scan):
     #     print(type(scan))
     #     print(len(scan))
         localMin = np.argmin(scan)
@@ -137,7 +137,7 @@ class ProbabLocalization():
         for i in self.__posMap:
             diff = 0
             for j in range(0,self.__sectionsNumberLocalization):
-                diff+=twoPointsSubstraction(i[1][j],tmpProbList[j])
+                diff+=twoPointsDist(i[1][j],tmpProbList[j])
             diffList.append(diff)
         # print("Selected point:", self.__posMap[np.argmin(diffList)][0])
         ############# orientation
@@ -149,6 +149,7 @@ class ProbabLocalization():
             sum += abs((tmpOrientList[i][0]-currentPoint[i][0])+(tmpOrientList[i][1]-currentPoint[i][1]))
         diffOrient.append(sum)
         currentPoint.append(currentPoint.pop(0))
+
         sum = 0
         while copyCurrentPoint != currentPoint:
             sum=0
@@ -157,11 +158,15 @@ class ProbabLocalization():
             diffOrient.append(sum)
             currentPoint.append(currentPoint.pop(0))
         orient = 0
-        print(orient)
+        # print(orient)
         orient = math.radians(np.argmin(diffOrient)*(360//self.__sectionNumberOrient))
         return self.__posMap[np.argmin(diffList)][0], orient
         #print(currentPoint)
 
+
+
+
+######################################################################
     def callback(self,msg):
         self.__scan = msg.ranges
     def printData(self):
