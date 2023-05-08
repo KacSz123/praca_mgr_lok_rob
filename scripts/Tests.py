@@ -7,6 +7,7 @@ import math
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import random
 # def twoPointsDist(a,b):
 #    return math.sqrt(pow(a[0]-b[0],2)+pow(a[1]-b[1],2))
 MAP_DIR = './map/'
@@ -27,7 +28,7 @@ def writeTestPointsToPickle():
     mfileName = 'rand-1000pts-w-orient-p2'
     mapCreator = mapCreation(startPose=(4,-11.2,0), fileName=TEST_POINTS_DIR+mfileName)
     mapCreator.initTopicConnection()
-    mapCreator.getRandomPointsToPickle((4, 11.2),(-12, -4.6), number=1000,precision=2)
+    mapCreator.getRandomPointsToPickle((4, -11.2),(-12, -4.5), number=1000,precision=2)
 
 def histLocalizationTest():
     errorList = []
@@ -43,12 +44,41 @@ def histLocalizationTest():
         p=hm.locateRobotScan(i["scan"])
         errorList.append(Dist2Points(p["point"],i["pose"]))
         orientErrList.append(abs(p["orientation"]-i["pose"][2]))
-
     #print(errorList)
     with open(RESULTS_DIR+'hist-debug-local.pkl', 'wb') as f:
         pickle.dump(errorList, f)
     with open(RESULTS_DIR+'hist-debug-orient.pkl', 'wb') as f:
         pickle.dump(orientErrList, f)
+
+
+def histLocalizationTestImpr():
+    errorList = []
+    orientErrList = []
+    hm=HistogramLocalization(bins=30,orientSection=5)
+    with open('./test-points/rand-1000pts-w-orient-p2.pkl', 'rb') as f:
+        data = pickle.load(f)
+    mapFile = './map/mapRoomWithShelf-res01.pkl'
+    hm.loadMapPickle(fileName=mapFile)
+    print(1)
+        # i = data[random.randint(0, 1000)]
+    for i in data:
+        # print(i["pose"], 'rzeczywisty')
+        p=hm.locateRobot(scanT=i["scan"])
+        errorList.append(Dist2Points(p["point"],i["pose"]))
+        orientErrList.append(abs(p["orientation"]-i["pose"][2]))
+        # print(p['point'], 'obliczony')
+        # print()
+    # print(errorList)
+    # print(orientErrList)
+    with open("./someTests/histImprNei30-o7.pkl", 'wb') as f:
+        pickle.dump(errorList, f)
+    with open('./someTests/histImprNei30-o7.pkl', 'rb') as f:
+        d = pickle.load(f)
+    s=pd.Series(d)
+    print("localization")
+    print(s.describe())
+
+
 def generateStatisticsHist():
     with open('./results/hist-debug-local.pkl', 'rb') as f:
         data = pickle.load(f)
@@ -83,6 +113,30 @@ def probabLocalizationOrientationTest():
     with open(RESULTS_DIR+'probab-Shelf-1000pts-orient-p2-sec30b.pkl', 'wb') as f:
         pickle.dump(orientErrList, f)
 
+def probabLocalizationOrientationTestNei():
+    errorList = []
+    orientErrList = []
+    pm=ProbabLocalization(sectionsNumberLocalization=5, sectionsNumberOrient=30)
+    with open('./test-points/rand-1000pts-w-orient-p2.pkl', 'rb') as f:
+        data = pickle.load(f)
+    mapFile = './map/mapRoomWithShelf-res01.pkl'
+    pm.loadMapLocalMinPickle(fileName=mapFile)
+    print(1)
+    for i in data:
+        # print(i["pose"]2
+        p,o=pm.locateRobotLocalMinimum(fileScan=i["scan"])
+        errorList.append(Dist2Points(p,i["pose"]))
+        orientErrList.append((abs(o-i["pose"][2])))
+    #print(errorList)
+    print(orientErrList)
+    with open("./someTests/ProbabImprNei5-o3.pkl", 'wb') as f:
+        pickle.dump(errorList, f)
+    with open('./someTests/ProbabImprNei5-o3.pkl', 'rb') as f:
+        d = pickle.load(f)
+    s=pd.Series(d)
+    print("localization")
+    print(s.describe())
+
 def generateStatisticsProbab():
     with open('./results/probab-Shelf-1000pts-local-p2-sec30b.pkl', 'rb') as f:
         data = pickle.load(f)
@@ -103,8 +157,9 @@ def showHistFromFile():
 def __main__():
     # probabLocalizationOrientationTest()
     # generateStatisticsProbab()
-    histLocalizationTest()
-    generateStatisticsHist()
+    # histLocalizationTestImpr()
+    probabLocalizationOrientationTestNei()
+    # generateStatisticsHist()
 
 
 if __name__ == "__main__":

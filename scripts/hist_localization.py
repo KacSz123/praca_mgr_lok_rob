@@ -9,6 +9,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import copy
+import sys
 ###################################
 # def twoPointsDist(a,b):
 #     return math.sqrt(pow(a[0]-b[0],2)+pow(a[1]-b[1],2))
@@ -30,10 +31,11 @@ class HistogramLocalization():
     __scan = []
     __ifSubscribing=False
     
-    def __init__(self, nodeName="Histogram_Localization",bins=20, orientSection=20):
+    def __init__(self, nodeName="Histogram_Localization",bins=20, orientSection=20, mRes=0.1):
         self.__nodeName = nodeName
         self.__binsNumber=bins
         self.__orientSectionNumber=orientSection
+        self.__mapRes = round(mRes,2)
         print(self.__orientSectionNumber)
     def loadMapJson(self, fileName):
         _scan = []
@@ -70,23 +72,29 @@ class HistogramLocalization():
             _scan = []
             _scango = data[j]["scan"]
             _pose = data[j]["pose"]
+            for k in range(0,len(_pose)):
+                _pose[k]=round(_pose[k], 2)
             for i in range(0, len(_scango)):
                 if (
                     not math.isnan(_scango[i])
                     and not math.isinf(_scango[i])
                 ):
+
                     _scan.append(_scango[i])
+            # print(_scan)
             self.__rawdata.append((_pose, _scan))
             self.__orientMap.append(self.generateOrientList(list(_scango)))
         self.MakeHistMap()
-
+        print(len(self.__map))
+        # print([self.__map[i][0] for i in range(0,len(self.__map))])
+        # input()
     def MakeHistMap(self):
         for i in self.__rawdata:
             # print(len(i[1]))
             hist, binno = np.histogram(
                 i[1], range=(0.0, 10.0), bins=self.__binsNumber)
             self.__map.append((i[0], hist, binno, self.__binsNumber, (0.0, 10.0)))
-
+        
 
 ###################################################
 
@@ -110,9 +118,13 @@ class HistogramLocalization():
             # print(counter)
         return orientList
 #######################################################
-
+    def __histSubstract(self, h1,h2):
+        diff = 0
+        for j in range(0, self.__binsNumber):
+            diff += abs(h1[j]-h2[j])
+        return diff
     def locateRobot(self, scanT=None):
-        if scanT!=None and self.__ifSubscribing==True:
+        if scanT!=None and self.__ifSubscribing==False:
             tmpscan=scanT
         else:
             print(len(self.__scan))
@@ -125,12 +137,39 @@ class HistogramLocalization():
                 diff += abs(i[1][j]-hist1[j])
             diffList.append(diff)
         diffList = np.array(diffList)
-        print('Selected point:', self.__map[np.argmin(diffList)][0])
-        # orientation
+        ######################################################################
+        ######################################################################
+        ####### sprawdzenie okolicy
+        ######################################################################
+        ######################################################################
+        a = self.__map[np.argmin(diffList)][0]
+        searchListX = [[round(a[0]+self.__mapRes,2), round(a[1],2),0],[round(a[0]-self.__mapRes,2), round(a[1],2),0]]
+        searchListY = [[round(a[0],2), round(a[1]+self.__mapRes,2),0],[round(a[0],2), round(a[1]-self.__mapRes,2),0]]
 
-        currentOrientList = self.generateOrientList(tmpscan)
+        pointsXList = []
+        neighbXErrList = []
+        pointsYList = []
+        neighbYErrList = []
         
+        for j in self.__map:
+            for i in searchListX:
+                if i[0]==j[0][0] and  i[1]==j[0][1] :
+                    pointsXList.append(j[0])
+                    neighbXErrList.append(self.__histSubstract(j[1],hist1))
+            for i in searchListY:
+                if i[0]==j[0][0] and  i[1]==j[0][1] :
+                    pointsYList.append(j[0])
+                    neighbYErrList.append(self.__histSubstract(j[1],hist1))
 
+        
+        neighbXErrList = np.array(neighbXErrList)
+        aX=np.argmin(neighbXErrList)
+        neighbYErrList = np.array(neighbYErrList)
+        aY=np.argmin(neighbYErrList)
+        # print(pointsList[a])
+
+        ######## orientation
+        currentOrientList = self.generateOrientList(tmpscan)
         tmpOrient = copy.deepcopy(self.__orientMap[np.argmin(diffList)])
         copyCurrentList = currentOrientList.copy()
         diffOrient = []
@@ -148,11 +187,19 @@ class HistogramLocalization():
             diffOrient.append(sum)
             copyCurrentList.append(copyCurrentList.pop(0))
         orient = math.radians(abs(np.argmin(diffOrient))*(360//self.__orientSectionNumber))
-        print("Orientation: ", orient)
-        return {"point":self.__map[np.argmin(diffList)][0],"orientation":orient}
+        # # print()
+        # print(self.__map[np.argmin(diffList)][0], ' poczatkowy')
+        # print(pointsXList)
+        # print(pointsYList)
+        K = 0.7
+        # print(aY)
+        p = [self.__map[np.argmin(diffList)][0][0]+(pointsXList[aX][0] - self.__map[np.argmin(diffList)][0][0])*K,
+             self.__map[np.argmin(diffList)][0][1]+(pointsYList[aY][1] - self.__map[np.argmin(diffList)][0][1])*K]
+        return {"point":p,"orientation":orient}
+
+
 
     def locateRobotScan(self,scanT):
-        #print(len(self.__scan))
         tmpscan = list(scanT).copy()
         hist1, b = np.histogram(tmpscan, range=(0.0, 10.0), bins=self.__binsNumber)
         diffList = []
@@ -207,7 +254,7 @@ class HistogramLocalization():
         print('\n')
 
     def initTopicConnection(self, topicName='/laser/scan'):
-        __ifSubscribing=True
+        self.__ifSubscribing=True
         rospy.init_node(self.__nodeName)
         rospy.Subscriber(topicName, LaserScan, self.callback)
 

@@ -19,15 +19,15 @@ def handler(signum, frame):
 signal.signal(signal.SIGINT, handler)
 
 class ProbabLocalization():
-    def __init__(self, nodeName="Probabilistic_Localization", sectionsNumberLocalization = 8,sectionsNumberOrient = 8):
+    def __init__(self, nodeName="Probabilistic_Localization", sectionsNumberLocalization = 8,sectionsNumberOrient = 8, mRes=0.1):
         self.__posMap = []
         self.__orientMap = []
         self.__rawdata = []
         self.__scan=[]
         self.__sectionsNumberLocalization = sectionsNumberLocalization
         self.__sectionNumberOrient = sectionsNumberOrient
-        rospy.init_node(nodeName)
-
+        
+        self.__mapRes = round(mRes,2)
 
     def loadMapOrientJson(self,fileName):
         _scango = []
@@ -66,6 +66,7 @@ class ProbabLocalization():
             # Wczytanie skanu z pierwszego zestawu danych
             _scango = data[j]["scan"]
             _pose = data[j]["pose"]
+            _pose = [round(_pose[i],2) for i in range(0,3)]
             self.__posMap.append((_pose, self.makeProbabDescrOneScanLocalMin(_scango)))
         #print(self.__posMap)
         
@@ -80,6 +81,8 @@ class ProbabLocalization():
             # Wczytanie skanu z pierwszego zestawu danych
             _scango = list(data[j]["scan"])
             _pose = data[j]["pose"]
+            _pose = [round(_pose[i],2) for i in range(0,3)]
+
             self.__posMap.append((_pose, self.makeProbabDescrOneScanLocalMin(_scango)))
 
 
@@ -123,7 +126,11 @@ class ProbabLocalization():
             currentProbList.append((GetMuSigmaFromEqSqrt(currentList)))
         return currentProbList
 
-
+    def __MarkvectSubstract(self, a,b):
+        diff=0
+        for j in range(0,self.__sectionsNumberLocalization):
+                diff+=twoPointsDist(a[j],b[j])
+        return diff
     def locateRobotLocalMinimum(self,fileScan=None):
         tmpscan=[]
         if fileScan == None:
@@ -140,6 +147,31 @@ class ProbabLocalization():
                 diff+=twoPointsDist(i[1][j],tmpProbList[j])
             diffList.append(diff)
         # print("Selected point:", self.__posMap[np.argmin(diffList)][0])
+
+
+        a = self.__posMap[np.argmin(diffList)][0]
+        searchListX = [[round(a[0]+self.__mapRes,2), round(a[1],2),0],[round(a[0]-self.__mapRes,2), round(a[1],2),0]]
+        searchListY = [[round(a[0],2), round(a[1]+self.__mapRes,2),0],[round(a[0],2), round(a[1]-self.__mapRes,2),0]]
+        ######## sasiedzi 
+        pointsXList = []
+        neighbXErrList = []
+        pointsYList = []
+        neighbYErrList = []
+        
+        for j in self.__posMap:
+            for i in searchListX:
+                if i[0]==j[0][0] and  i[1]==j[0][1] :
+                    pointsXList.append(j[0])
+                    neighbXErrList.append(self.__MarkvectSubstract(j[1],tmpProbList))
+            for i in searchListY:
+                if i[0]==j[0][0] and  i[1]==j[0][1] :
+                    pointsYList.append(j[0])
+                    neighbYErrList.append(self.__MarkvectSubstract(j[1],tmpProbList))
+
+        neighbXErrList = np.array(neighbXErrList)
+        aX=np.argmin(neighbXErrList)
+        neighbYErrList = np.array(neighbYErrList)
+        aY=np.argmin(neighbYErrList)
         ############# orientation
         currentPoint = self.__orientMap[np.argmin(diffList)][1]
         copyCurrentPoint = currentPoint.copy()
@@ -160,7 +192,13 @@ class ProbabLocalization():
         orient = 0
         # print(orient)
         orient = math.radians(np.argmin(diffOrient)*(360//self.__sectionNumberOrient))
-        return self.__posMap[np.argmin(diffList)][0], orient
+
+        K=0.3
+        p = [self.__posMap[np.argmin(diffList)][0][0]+(pointsXList[aX][0] - self.__posMap[np.argmin(diffList)][0][0])*K,
+             self.__posMap[np.argmin(diffList)][0][1]+(pointsYList[aY][1] - self.__posMap[np.argmin(diffList)][0][1])*K]
+
+
+        return p, orient
         #print(currentPoint)
 
 
@@ -173,6 +211,7 @@ class ProbabLocalization():
         for i in self.__rawdata:
             print(i)
     def initTopicConnection(self, topicName= '/laser/scan'):
+        rospy.init_node(nodeName="Probabilistic_Localization")
         rospy.Subscriber(topicName, LaserScan, self.callback)        
     def exitTopicConnection(self):
         self.sub.unregister()
