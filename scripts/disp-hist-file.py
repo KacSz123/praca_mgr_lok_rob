@@ -2,7 +2,7 @@ import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 import pickle
-
+import sys
 
 
 def __main__():
@@ -15,7 +15,7 @@ def __main__():
  args = parser.parse_args()
  if args.filename==None:
     print('required path to file\n')
-    return -1
+
  else:
         b=0
         if args.bins==None:
@@ -30,8 +30,5 @@ def __main__():
         plt.hist(np.array(data), bins=b)
         plt.show()
 if __name__ == '__main__':
-    a=1
-    try:
+
         __main__()
-    except __main__:
-        pass

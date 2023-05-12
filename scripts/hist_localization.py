@@ -117,13 +117,39 @@ class HistogramLocalization():
                 # print(sum/counter)
             # print(counter)
         return orientList
-#######################################################
+###################################################################################
+############################ methods of neighbours comparation ####################
     def __histSubstract(self, h1,h2):
         diff = 0
         for j in range(0, self.__binsNumber):
             diff += abs(h1[j]-h2[j])
         return diff
-    def locateRobot(self, scanT=None):
+    def __histMaxDifference(self, h1,h2):
+        maxa,maxb = -1,-1
+        maxdiff = 0 
+        for j in range(0, self.__binsNumber):
+            a = abs(h1[j]-h2[j])
+            if (a>maxdiff):
+                maxdiff = a
+        return maxdiff
+    
+    def __histMinMaxDifference(self, h1,h2):
+        maxdiff,mindiff = 0, 10000 
+        for j in range(0, self.__binsNumber):
+            tmp = abs(h1[j]-h2[j])
+            if (tmp>maxdiff):
+                maxdiff = tmp
+            if tmp<mindiff:
+                mindiff = tmp
+        return (maxdiff+mindiff)/2.0
+    
+    def __histMeanDifference(self,h1, h2):
+        diff = 0
+        for j in range(0, self.__binsNumber):
+            diff += abs(h1[j]-h2[j])
+        return diff/self.__binsNumber
+
+    def locateRobot(self, scanT=None, neighbours=None):
         if scanT!=None and self.__ifSubscribing==False:
             tmpscan=scanT
         else:
@@ -143,6 +169,7 @@ class HistogramLocalization():
         ######################################################################
         ######################################################################
         a = self.__map[np.argmin(diffList)][0]
+        first = self.__map[np.argmin(diffList)][1]
         searchListX = [[round(a[0]+self.__mapRes,2), round(a[1],2),0],[round(a[0]-self.__mapRes,2), round(a[1],2),0]]
         searchListY = [[round(a[0],2), round(a[1]+self.__mapRes,2),0],[round(a[0],2), round(a[1]-self.__mapRes,2),0]]
 
@@ -155,11 +182,11 @@ class HistogramLocalization():
             for i in searchListX:
                 if i[0]==j[0][0] and  i[1]==j[0][1] :
                     pointsXList.append(j[0])
-                    neighbXErrList.append(self.__histSubstract(j[1],hist1))
+                    neighbXErrList.append(self.__histMeanDifference(j[1],hist1))
             for i in searchListY:
                 if i[0]==j[0][0] and  i[1]==j[0][1] :
                     pointsYList.append(j[0])
-                    neighbYErrList.append(self.__histSubstract(j[1],hist1))
+                    neighbYErrList.append(self.__histMeanDifference(j[1],hist1))
 
         
         neighbXErrList = np.array(neighbXErrList)
@@ -191,7 +218,7 @@ class HistogramLocalization():
         # print(self.__map[np.argmin(diffList)][0], ' poczatkowy')
         # print(pointsXList)
         # print(pointsYList)
-        K = 0.7
+        K = 0.3
         # print(aY)
         p = [self.__map[np.argmin(diffList)][0][0]+(pointsXList[aX][0] - self.__map[np.argmin(diffList)][0][0])*K,
              self.__map[np.argmin(diffList)][0][1]+(pointsYList[aY][1] - self.__map[np.argmin(diffList)][0][1])*K]

@@ -54,7 +54,7 @@ def histLocalizationTest():
 def histLocalizationTestImpr():
     errorList = []
     orientErrList = []
-    hm=HistogramLocalization(bins=30,orientSection=5)
+    hm=HistogramLocalization(bins=30,orientSection=30)
     with open('./test-points/rand-1000pts-w-orient-p2.pkl', 'rb') as f:
         data = pickle.load(f)
     mapFile = './map/mapRoomWithShelf-res01.pkl'
@@ -70,9 +70,9 @@ def histLocalizationTestImpr():
         # print()
     # print(errorList)
     # print(orientErrList)
-    with open("./someTests/histImprNei30-o7.pkl", 'wb') as f:
+    with open("./someTests/histImprNei30-o3b.pkl", 'wb') as f:
         pickle.dump(errorList, f)
-    with open('./someTests/histImprNei30-o7.pkl', 'rb') as f:
+    with open('./someTests/histImprNei30-o3b.pkl', 'rb') as f:
         d = pickle.load(f)
     s=pd.Series(d)
     print("localization")
@@ -157,8 +157,8 @@ def showHistFromFile():
 def __main__():
     # probabLocalizationOrientationTest()
     # generateStatisticsProbab()
-    # histLocalizationTestImpr()
-    probabLocalizationOrientationTestNei()
+    histLocalizationTestImpr()
+    #probabLocalizationOrientationTestNei()
     # generateStatisticsHist()
 
 
