@@ -36,7 +36,7 @@ class HistogramLocalization():
         self.__binsNumber=bins
         self.__orientSectionNumber=orientSection
         self.__mapRes = round(mRes,2)
-        print(self.__orientSectionNumber)
+        print(self.__binsNumber)
     def loadMapJson(self, fileName):
         _scan = []
         _scango = []
@@ -169,7 +169,7 @@ class HistogramLocalization():
         ######################################################################
         ######################################################################
         a = self.__map[np.argmin(diffList)][0]
-        first = self.__map[np.argmin(diffList)][1]
+        Apoint = self.__map[np.argmin(diffList)][1]
         searchListX = [[round(a[0]+self.__mapRes,2), round(a[1],2),0],[round(a[0]-self.__mapRes,2), round(a[1],2),0]]
         searchListY = [[round(a[0],2), round(a[1]+self.__mapRes,2),0],[round(a[0],2), round(a[1]-self.__mapRes,2),0]]
 
@@ -177,16 +177,19 @@ class HistogramLocalization():
         neighbXErrList = []
         pointsYList = []
         neighbYErrList = []
-        
+        xHist=[]
+        yHist=[]
         for j in self.__map:
             for i in searchListX:
                 if i[0]==j[0][0] and  i[1]==j[0][1] :
                     pointsXList.append(j[0])
                     neighbXErrList.append(self.__histMeanDifference(j[1],hist1))
+                    xHist.append(j[1])
             for i in searchListY:
                 if i[0]==j[0][0] and  i[1]==j[0][1] :
                     pointsYList.append(j[0])
                     neighbYErrList.append(self.__histMeanDifference(j[1],hist1))
+                    yHist.append(j[1])
 
         
         neighbXErrList = np.array(neighbXErrList)
@@ -213,15 +216,18 @@ class HistogramLocalization():
                 sum += abs(tmpOrient[i]-copyCurrentList[i])
             diffOrient.append(sum)
             copyCurrentList.append(copyCurrentList.pop(0))
-        orient = math.radians(abs(np.argmin(diffOrient))*(360//self.__orientSectionNumber))
+        orient = math.radians(abs(np.argmin(diffOrient))*(360/self.__orientSectionNumber))
         # # print()
         # print(self.__map[np.argmin(diffList)][0], ' poczatkowy')
         # print(pointsXList)
         # print(pointsYList)
-        K = 0.3
+        zX = self.__histSubstract(Apoint, xHist[aX])
+        zY =  self.__histSubstract(Apoint,  yHist[aY])
+        xiX = neighbXErrList[aX]/zX
+        xiY = neighbXErrList[aX]/zY
         # print(aY)
-        p = [self.__map[np.argmin(diffList)][0][0]+(pointsXList[aX][0] - self.__map[np.argmin(diffList)][0][0])*K,
-             self.__map[np.argmin(diffList)][0][1]+(pointsYList[aY][1] - self.__map[np.argmin(diffList)][0][1])*K]
+        p = [self.__map[np.argmin(diffList)][0][0]+(pointsXList[aX][0] - self.__map[np.argmin(diffList)][0][0])*xiX,
+             self.__map[np.argmin(diffList)][0][1]+(pointsYList[aY][1] - self.__map[np.argmin(diffList)][0][1])*xiY]
         return {"point":p,"orientation":orient}
 
 
