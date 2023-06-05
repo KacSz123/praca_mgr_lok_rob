@@ -62,20 +62,26 @@ class mapCreation():
         #jsonStr = json.dumps(self.__mapList)
         with open(self.__fileName+'.json', 'w') as f:
              json.dump(self.__mapList, f)
-        print(1)
+        # print(1)
 
-    def writeMapToPickleFile(self, xRange, yRange, resolution=(0.5,0.5)):
+    def writeMapToPickleFile(self, xRange, yRange, resolution=(0.5,0.5), fileName=None):
         print(1)
         self.__mapList.clear()
         for i in np.arange(xRange[0],xRange[1],resolution[0]):
-            for j in np.arange(yRange[0],yRange[1],resolution[1]):
-                self.__setRobotPosition((i,j))
-                time.sleep(0.3)
-                self.__mapList.append({"pose":[i,j,0],"scan":self.__scan})
-        time.sleep(0.5)
-        name=self.__fileName+'.pkl'
+            for j in np.arange(yRange[0],yRange[1]+resolution[1]-resolution[1]/10,resolution[1]):
+                self.__setRobotPosition((round(i,4),round(j,4),0.000))
+                # print(j)
+                time.sleep(0.4)
+                self.__mapList.append({"pose":[round(i,4),round(j,4),0],"scan":self.__scan})
+        time.sleep(0.7)
+        if fileName==None:
+            name=self.__fileName+'.pkl'
+        else:
+            name==fileName+'.pkl'
         with open(name, 'wb') as f:
              pickle.dump(self.__mapList, f)
+        
+        return self.__mapList
 
 
     def getRandomPointsToPickle(self, xRange, yRange, number=1000, precision=1):
@@ -99,7 +105,7 @@ class mapCreation():
              pickle.dump(self.__mapList, f)
         # print(len(pointsList))
         # print(pointsList)
-
+        return self.__mapList
     def getRandomPointsToJson():
         return
 

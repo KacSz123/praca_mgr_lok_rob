@@ -28,6 +28,8 @@ def __main__():
         with open(str(args.filename), 'rb') as f:
             data = pickle.load(f)
         plt.hist(np.array(data), bins=b)
+        plt.xlabel('Wartość błędu [rad]')
+        plt.ylabel('Liczba wystąpień')
         plt.show()
 if __name__ == '__main__':
 
