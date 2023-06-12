@@ -67,12 +67,15 @@ class mapCreation():
     def writeMapToPickleFile(self, xRange, yRange, resolution=(0.5,0.5), fileName=None):
         print(1)
         self.__mapList.clear()
-        for i in np.arange(xRange[0],xRange[1],resolution[0]):
-            for j in np.arange(yRange[0],yRange[1]+resolution[1]-resolution[1]/10,resolution[1]):
-                self.__setRobotPosition((round(i,4),round(j,4),0.000))
+        # for i in np.arange(xRange[0],xRange[1]+resolution[1]-resolution[1]/10,resolution[0]):
+        #     for j in np.arange(yRange[0],yRange[1]+resolution[1]-resolution[1]/10,resolution[1]):
+        x  = np.arange(xRange[0],xRange[1]+resolution[1]-resolution[1]/10,resolution[0])
+        y = np.arange(yRange[0],yRange[1]+resolution[1]-resolution[1]/10,resolution[1])
+        for i in range(0, len(x)):
+                self.__setRobotPosition((round(x[i],4),round(y[i],4),0.000))
                 # print(j)
                 time.sleep(0.4)
-                self.__mapList.append({"pose":[round(i,4),round(j,4),0],"scan":self.__scan})
+                self.__mapList.append({"pose":[round(x[i],4),round(y[i],4),0],"scan":self.__scan})
         time.sleep(0.7)
         if fileName==None:
             name=self.__fileName+'.pkl'

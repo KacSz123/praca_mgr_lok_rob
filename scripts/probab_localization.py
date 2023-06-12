@@ -131,7 +131,12 @@ class ProbabLocalization():
         for j in range(0,self.__sectionsNumberLocalization):
                 diff+=twoPointsDist(a[j],b[j])
         return diff
-    def locateRobotLocalMinimum(self,fileScan=None):
+    def __MarkvectMean(self, a,b):
+        diff=0
+        for j in range(0,self.__sectionsNumberLocalization):
+                diff+=twoPointsDist(a[j],b[j])
+        return diff/self.__sectionsNumberLocalization
+    def locateRobotLocalMinimum(self,fileScan=None, G=(1.05,1.05)):
         tmpscan=[]
         if fileScan == None:
             tmpscan = self.__scan
@@ -150,24 +155,30 @@ class ProbabLocalization():
 
 
         a = self.__posMap[np.argmin(diffList)][0]
-        searchListX = [[round(a[0]+self.__mapRes,2), round(a[1],2),0],[round(a[0]-self.__mapRes,2), round(a[1],2),0]]
-        searchListY = [[round(a[0],2), round(a[1]+self.__mapRes,2),0],[round(a[0],2), round(a[1]-self.__mapRes,2),0]]
-        ######## sasiedzi 
+        Apoint = self.__posMap[np.argmin(diffList)][1]
+        # Apoint = self.__posMap[np.argmin(diffList)][0]
+        searchListX = [[round(a[0]+self.__mapRes,1), round(a[1],1),0],[round(a[0]-self.__mapRes,1), round(a[1],1),0]]
+        searchListY = [[round(a[0],1), round(a[1]+self.__mapRes,1),0],[round(a[0],1), round(a[1]-self.__mapRes,1),0]]
+       ######## sasiedzi 
         pointsXList = []
         neighbXErrList = []
         pointsYList = []
         neighbYErrList = []
-        
+        xProb=[]
+        yProb=[]
+
+
         for j in self.__posMap:
             for i in searchListX:
                 if i[0]==j[0][0] and  i[1]==j[0][1] :
                     pointsXList.append(j[0])
+                    xProb.append(j[1])
                     neighbXErrList.append(self.__MarkvectSubstract(j[1],tmpProbList))
             for i in searchListY:
                 if i[0]==j[0][0] and  i[1]==j[0][1] :
                     pointsYList.append(j[0])
                     neighbYErrList.append(self.__MarkvectSubstract(j[1],tmpProbList))
-
+                    yProb.append(j[1])
         neighbXErrList = np.array(neighbXErrList)
         aX=np.argmin(neighbXErrList)
         neighbYErrList = np.array(neighbYErrList)
@@ -190,15 +201,26 @@ class ProbabLocalization():
             diffOrient.append(sum)
             currentPoint.append(currentPoint.pop(0))
         orient = 0
-        # print(orient)
+        print(self.__posMap[np.argmin(diffList)][0], ' poczatkowy')
         orient = math.radians(np.argmin(diffOrient)*(360//self.__sectionNumberOrient))
+        
+        
+        zX = self.__MarkvectSubstract(Apoint, xProb[aX])
+        zY =  self.__MarkvectSubstract(Apoint,  yProb[aY])
+        xiX = abs(1-(neighbXErrList[aX]/zX)*G[0])
+        xiY = abs(1-(neighbYErrList[aY]/zY)*G[1])
+        print("  nX:", neighbXErrList[aX], "  zX: ",zX,  " xiX: ", xiX)
+        print("  nX:", neighbYErrList[aY], "  zY: ",zY, " xiY: ", xiY)
+        print("ratio", xiX/xiY)
+        
+        p = [round(self.__posMap[np.argmin(diffList)][0][0]+(pointsXList[aX][0] -self.__posMap[np.argmin(diffList)][0][0])*xiX,4),
+             round(self.__posMap[np.argmin(diffList)][0][1]+(pointsYList[aY][1] -self.__posMap[np.argmin(diffList)][0][1])*xiY,4)]
+        
+        
+        
+        return {"point":p,"orientation":orient,"ksiX": xiX,"ksiY":xiY}
 
-        K=0.3
-        p = [self.__posMap[np.argmin(diffList)][0][0]+(pointsXList[aX][0] - self.__posMap[np.argmin(diffList)][0][0])*K,
-             self.__posMap[np.argmin(diffList)][0][1]+(pointsYList[aY][1] - self.__posMap[np.argmin(diffList)][0][1])*K]
 
-
-        return p, orient
         #print(currentPoint)
 
 

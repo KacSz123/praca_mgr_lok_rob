@@ -10,6 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import random
 import sys
+import time
 # def twoPointsDist(a,b):
 #    return math.sqrt(pow(a[0]-b[0],2)+pow(a[1]-b[1],2))
 MAP_DIR = './map/'
@@ -33,28 +34,94 @@ def K_parameter_tests(name):
     hm.loadMapPickle(fileName=mapFile)
     print(1)
         # i = data[random.randint(0, 1000)]
-    ksi=[]
+    ksiX=[]
+    ksiY=[]
     xlist=[]
+    ylist=[]
     xerr=[]
+    yerr=[]
     for i in range(0, len(data)):
         xlist.append(data[i]['pose'][0])
+        ylist.append(data[i]['pose'][1])
+        # xlist.append(data[i]['pose'][0])
         # print(i["pose"], 'rzeczywisty')
-        p=hm.locateRobot(scanT=data[i]["scan"])
+        p=hm.locateRobot(scanT=data[i]["scan"], G=(1.20, 1.20))
         errorList.append(Dist2Points(p["point"],data[i]["pose"]))
         orientErrList.append(abs(p["orientation"]-data[i]["pose"][2]))
         
         print(p['point'], 'skorygowany')
         print(data[i]['pose'], 'rzeczywisty')
         print()
-        xerr.append(abs(p['point'][0]-data[i]['pose'][0]))
-        ksi.append(p['ksiX'])
+        xerr.append(abs(p['point'][1]-data[i]['pose'][1]))
+        ksiX.append(p['ksiX'])
+        ksiY.append(p['ksiY'])
     plt.figure(1)
-    plt.plot(xlist, ksi,'.')
+    plt.plot(xlist, ksiX,'.',color='r')
+    plt.plot(xlist, ksiY,'+',color='g')
+    tmp=[]
+    for i in np.arange(0.0, 0.5, 0.01): 
+        tmp.append(round(i,2))
+    for i in np.arange(0.501, 0.0, -0.01) : 
+        tmp.append(round(i,2))
+    plt.plot(xlist, tmp,color='b')
     plt.grid()
-    plt.title('Wartość parametru ξ dla:'+str(data[0]['pose'][0])+' do '+str(data[len(data)-1]['pose'][0]))
-    plt.xlabel('Pozycja robota na osi X')
+    # plt.title('Wartość parametru ξ dla:'+str(data[0]['pose'][0])+' do '+str(data[len(data)-1]['pose'][0]))
+    plt.xlabel('Pozycja robota na osi Y')
     plt.ylabel('Wartość parametru ξ')
     plt.show()
+    okok = {'ksiX':ksiX, 'ksiY':ksiY, 'Y':ylist, 'X':xlist}
+    with open(name[:-4]+'G(1.20,1.20)-plotb.pkl', 'wb') as f:
+        pickle.dump(okok, f)
+
+def K_parameter_testsProbab(name):
+    
+    errorList = []
+    orientErrList = []
+    hm=ProbabLocalization(sectionsNumberLocalization=30,sectionsNumberOrient=30)
+    with open(name, 'rb') as f:
+        data = pickle.load(f)
+    mapFile = './map/mapRoomWithShelf-res01.pkl'
+    hm.loadMapLocalMinPickle(fileName=mapFile)
+    print(1)
+        # i = data[random.randint(0, 1000)]
+    ksiX=[]
+    ksiY=[]
+    xlist=[]
+    xerr=[]
+    yerr=[]
+    
+    for i in range(0, len(data)):
+        # time.sleep(0.5)
+        xlist.append(data[i]['pose'][0])
+        # print(i["pose"], 'rzeczywisty')
+        p=hm.locateRobotLocalMinimum(fileScan=data[i]["scan"], G=(0.5, 0.5))
+        errorList.append(Dist2Points(p["point"],data[i]["pose"]))
+        orientErrList.append(abs(p["orientation"]-data[i]["pose"][2]))
+        
+        print(p['point'], 'skorygowany')
+        print(data[i]['pose'], 'rzeczywisty')
+        print()
+        xerr.append(abs(p['point'][1]-data[i]['pose'][1]))
+        ksiX.append(p['ksiX'])
+        ksiY.append(p['ksiY'])
+    plt.figure(1)
+    plt.plot(xlist, ksiX,'.',color='r')
+    plt.plot(xlist, ksiY,'+',color='g')
+    tmp=[]
+    for i in np.arange(0.0, 0.5, 0.01): 
+        tmp.append(round(i,2))
+    for i in np.arange(0.50, 0.0, -0.01) : 
+        tmp.append(round(i,2))
+    plt.plot(xlist, tmp,color='b')
+    plt.grid()
+    # plt.title('Wartość parametru ξ dla:'+str(data[0]['pose'][0])+' do '+str(data[len(data)-1]['pose'][0]))
+    plt.xlabel('Pozycja robota na osi Y')
+    plt.ylabel('Wartość parametru ξ')
+    plt.show()
+    okok = {'ksi':ksiY, 'zakres':xlist}
+    with open(name[:-4]+'0.98G-plot-prob.pkl', 'wb') as f:
+        pickle.dump(okok, f)
+
     # plt.figure(2)
     # plt.plot(xlist, xerr)
     # plt.show()
@@ -140,7 +207,7 @@ def writeMapTofilePickleForKsi(name):
     mfileName = name
     mapCreator = mapCreation(startPose=(5.24000, -8.05000,0.000), fileName=MAP_DIR+mfileName)
     mapCreator.initTopicConnection()
-    mapCreator.writeMapToPickleFile(xRange=(4.3000,4.400000), yRange=(-6.00000, -6.0000), resolution=(0.001,0.001))
+    mapCreator.writeMapToPickleFile(xRange=(6.3000,6.400000), yRange=(-10.10000, -10.0000), resolution=(0.001,0.001))
 
 def writeTestPointsToPickle():
     mfileName = 'rand-1000pts-w-orient-p2'
@@ -187,7 +254,7 @@ def histLocalizationTest():
 def histLocalizationTestImpr():
     errorList = []
     orientErrList = []
-    hm=HistogramLocalization(bins=30,orientSection=25)
+    hm=HistogramLocalization(bins=50,orientSection=30)
     with open('./test-points/rand-1000pts-w-orient-p2.pkl', 'rb') as f:
         data = pickle.load(f)
     mapFile = './map/mapRoomWithShelf-res01.pkl'
@@ -196,7 +263,7 @@ def histLocalizationTestImpr():
         # i = data[random.randint(0, 1000)]
     for i in data:
         # print(i["pose"], 'rzeczywisty')
-        p=hm.locateRobot(scanT=i["scan"])
+        p=hm.locateRobot(scanT=i["scan"],G=(0.80, 0.70))
         errorList.append(Dist2Points(p["point"],i["pose"]))
         orientErrList.append(abs(p["orientation"]-i["pose"][2]))
         # print(p['point'], 'obliczony')
@@ -297,7 +364,8 @@ def __main__():
     # generateStatisticsHist()
     # prezka()
     # histLocalizationTestImpr()
-    # writeMapTofilePickleForKsi('point43-44X_K_map')
-    K_parameter_tests('./map/point43-44X_K_map.pkl')
+    # writeMapTofilePickleForKsi('point-XY_K_map')
+    K_parameter_tests('./map/point-XY_K_map.pkl')
+    # K_parameter_testsProbab('./map/point49-50X_K_map.pkl')
 if __name__ == "__main__":
     __main__()

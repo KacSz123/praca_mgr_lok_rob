@@ -149,7 +149,7 @@ class HistogramLocalization():
             diff += abs(h1[j]-h2[j])
         return diff/self.__binsNumber
 
-    def locateRobot(self, scanT=None, neighbours=None, G=1.05):
+    def locateRobot(self, scanT=None,  G=(1.05, 1.1)):
         if scanT!=None and self.__ifSubscribing==False:
             tmpscan=scanT
         else:
@@ -229,13 +229,12 @@ class HistogramLocalization():
         # print(pointsYList)
         zX = self.__histSubstract(Apoint, xHist[aX])
         zY =  self.__histSubstract(Apoint,  yHist[aY])
-        xiX = abs(1-neighbXErrList[aX]/(zX*(1.0)))
-        xiY = 0 #neighbXErrList[aX]/zY 
-        
-        
-
+        xiX = abs(1-(neighbXErrList[aX]/zX))*G[0]
+        xiY = abs(1-(neighbYErrList[aY]/zY))*G[1]
+        print(zX/zY, ' ratio zx/zy')
         print(a, 'wytypowany')
-        p = [round(self.__map[np.argmin(diffList)][0][0]+(pointsXList[aX][0] - self.__map[np.argmin(diffList)][0][0])*xiX,4),
+ 
+        p = [round(self.__map[np.argmin(diffList)][0][0]+(pointsXList[aX][0] -self.__map[np.argmin(diffList)][0][0])*xiX,4),
              round(self.__map[np.argmin(diffList)][0][1]+(pointsYList[aY][1] - self.__map[np.argmin(diffList)][0][1])*xiY,4)]
         return {"point":p,"orientation":orient,"ksiX": xiX,"ksiY":xiY}
 
