@@ -87,14 +87,16 @@ def K_parameter_testsProbab(name):
     ksiX=[]
     ksiY=[]
     xlist=[]
+    ylist=[]
     xerr=[]
     yerr=[]
     
     for i in range(0, len(data)):
         # time.sleep(0.5)
         xlist.append(data[i]['pose'][0])
+        ylist.append(data[i]['pose'][1])
         # print(i["pose"], 'rzeczywisty')
-        p=hm.locateRobotLocalMinimum(fileScan=data[i]["scan"], G=(0.5, 0.5))
+        p=hm.locateRobotLocalMinimum(fileScan=data[i]["scan"], G=(1.2, 1.2))
         errorList.append(Dist2Points(p["point"],data[i]["pose"]))
         orientErrList.append(abs(p["orientation"]-data[i]["pose"][2]))
         
@@ -104,22 +106,9 @@ def K_parameter_testsProbab(name):
         xerr.append(abs(p['point'][1]-data[i]['pose'][1]))
         ksiX.append(p['ksiX'])
         ksiY.append(p['ksiY'])
-    plt.figure(1)
-    plt.plot(xlist, ksiX,'.',color='r')
-    plt.plot(xlist, ksiY,'+',color='g')
-    tmp=[]
-    for i in np.arange(0.0, 0.5, 0.01): 
-        tmp.append(round(i,2))
-    for i in np.arange(0.50, 0.0, -0.01) : 
-        tmp.append(round(i,2))
-    plt.plot(xlist, tmp,color='b')
-    plt.grid()
-    # plt.title('Wartość parametru ξ dla:'+str(data[0]['pose'][0])+' do '+str(data[len(data)-1]['pose'][0]))
-    plt.xlabel('Pozycja robota na osi Y')
-    plt.ylabel('Wartość parametru ξ')
-    plt.show()
-    okok = {'ksi':ksiY, 'zakres':xlist}
-    with open(name[:-4]+'0.98G-plot-prob.pkl', 'wb') as f:
+    # plt.figure(1)75
+    okok = {'ksiY':ksiY,'ksiX':ksiX, 'X':xlist, 'Y':ylist, }
+    with open(name[:-4]+'G(1.2,1.2)-plot-prob.pkl', 'wb') as f:
         pickle.dump(okok, f)
 
     # plt.figure(2)
@@ -365,7 +354,7 @@ def __main__():
     # prezka()
     # histLocalizationTestImpr()
     # writeMapTofilePickleForKsi('point-XY_K_map')
-    K_parameter_tests('./map/point-XY_K_map.pkl')
-    # K_parameter_testsProbab('./map/point49-50X_K_map.pkl')
+    # K_parameter_tests('./map/point-XY_K_map.pkl')
+    K_parameter_testsProbab('./map/point-XY_K_map.pkl')
 if __name__ == "__main__":
     __main__()

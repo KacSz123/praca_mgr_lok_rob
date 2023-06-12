@@ -7,8 +7,8 @@ from mpl_toolkits.mplot3d import Axes3D
 def plot2d():
         DIR = './map/'
 
-        name = DIR + 'point-XY_K_mapG(0.95,0.80)-plot.pkl'
-        savename =   'point-XY_K_mapG(0.95,0.80)-plot.png'
+        name = DIR + 'point-XY_K_mapG(1.2,1.2)-plot-prob.pkl'
+        savename =   'point-XY_K_mapG(1.2,1.2)-plot-prob.png'
         with open(name, 'rb') as f:
                 data = pickle.load(f)
 
@@ -57,8 +57,8 @@ def plot2d():
 def plot3d():
         DIR = './map/'
 
-        name = DIR + 'point-XY_K_mapG(1.20,1.20)-plotb.pkl'
-        savename ='3dpoint-XY_K_mapG(1.20,1.20)-plotb.png'
+        name = DIR + 'point-XY_K_mapG(1.2,1.2)-plot-prob.pkl'
+        savename = '3dpoint-XY_K_mapG(1.2,1.2)-plot-prob.png'
         with open(name, 'rb') as f:
                 data = pickle.load(f)
 
@@ -115,6 +115,6 @@ def plot3d():
         # ax.autoscale_view()
         
         plt.savefig(savename)
-        plt.show()
-# plot3d()
-plot2d()
+        # plt.sho1(2
+plot3d()
+# plot2d()
