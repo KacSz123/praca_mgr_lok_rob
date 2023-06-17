@@ -5,6 +5,10 @@ import pickle
 import sys
 
 
+# def __main__():
+#     pass
+
+
 def __main__():
  parser = argparse.ArgumentParser(
                     prog='histogram displayer',
@@ -27,10 +31,11 @@ def __main__():
 
         with open(str(args.filename), 'rb') as f:
             data = pickle.load(f)
-        plt.hist(np.array(data), bins=b)
+        plt.hist(np.array(data), bins=b, range=(0, 7.5))
         plt.xlabel('Wartość błędu [rad]')
         plt.ylabel('Liczba wystąpień')
         plt.show()
+        plt.savefig('')
 if __name__ == '__main__':
 
         __main__()

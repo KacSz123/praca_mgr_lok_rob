@@ -201,17 +201,17 @@ class ProbabLocalization():
             diffOrient.append(sum)
             currentPoint.append(currentPoint.pop(0))
         orient = 0
-        print(self.__posMap[np.argmin(diffList)][0], ' poczatkowy')
+        # print(self.__posMap[np.argmin(diffList)][0], ' poczatkowy')
         orient = math.radians(np.argmin(diffOrient)*(360//self.__sectionNumberOrient))
         
         
         zX = self.__MarkvectSubstract(Apoint, xProb[aX])
         zY =  self.__MarkvectSubstract(Apoint,  yProb[aY])
-        xiX = abs(1-(neighbXErrList[aX]/zX)*G[0])
-        xiY = abs(1-(neighbYErrList[aY]/zY)*G[1])
-        print("  nX:", neighbXErrList[aX], "  zX: ",zX,  " xiX: ", xiX)
-        print("  nX:", neighbYErrList[aY], "  zY: ",zY, " xiY: ", xiY)
-        print("ratio", xiX/xiY)
+        xiX = abs(1-(neighbXErrList[aX]/zX))*G[0]
+        xiY = abs(1-(neighbYErrList[aY]/zY))*G[1]
+        # print("  nX:", neighbXErrList[aX], "  zX: ",zX,  " xiX: ", xiX)
+        # print("  nX:", neighbYErrList[aY], "  zY: ",zY, " xiY: ", xiY)
+        # print("ratio", xiX/xiY)
         
         p = [round(self.__posMap[np.argmin(diffList)][0][0]+(pointsXList[aX][0] -self.__posMap[np.argmin(diffList)][0][0])*xiX,4),
              round(self.__posMap[np.argmin(diffList)][0][1]+(pointsYList[aY][1] -self.__posMap[np.argmin(diffList)][0][1])*xiY,4)]

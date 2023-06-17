@@ -18,13 +18,13 @@ from map_creation import mapCreation as mC
 
 class HistogramLocalization():
 
-    __map = []
-    __orientMap = []
-    __rawdata = []
-    __scan = []
-    __ifSubscribing=False
     
     def __init__(self, nodeName="Histogram_Localization",bins=20, orientSection=20, mRes=0.1):
+        self.__map = []
+        self.__orientMap = []
+        self.__rawdata = []
+        self.__scan = []
+        self.__ifSubscribing=False
         self.__nodeName = nodeName
         self.__binsNumber=bins
         self.__orientSectionNumber=orientSection
@@ -72,15 +72,16 @@ class HistogramLocalization():
             for i in range(0, len(_scango)):
                 if (
                     not math.isnan(_scango[i])
-                    and not math.isinf(_scango[i])
+                    and not  math.isinf(_scango[i])
                 ):
-
                     _scan.append(_scango[i])
-            # print(_scan)
+            # print(len(_scan))
             self.__rawdata.append((_pose, _scan))
+            self.__map.append((_pose,np.histogram(_scan, range=(0.0, 10.0), bins=self.__binsNumber)[0]))
             self.__orientMap.append(self.generateOrientList(list(_scango)))
+
         self.makeHistMap()
-        print(len(self.__map))
+        # print(len(self.__map))
         # print([self.__map[i][0] for i in range(0,len(self.__map))])
         # input()
     def makeHistMap(self):
@@ -88,7 +89,7 @@ class HistogramLocalization():
             # print(len(i[1]))
             hist, binno = np.histogram(
                 i[1], range=(0.0, 10.0), bins=self.__binsNumber)
-            self.__map.append((i[0], hist, binno, self.__binsNumber, (0.0, 10.0)))
+            self.__map.append((i[0], hist))
         
 
 ###################################################
@@ -114,10 +115,7 @@ class HistogramLocalization():
         return orientList
 ###################################################################################
 ############################ methods of neighbours comparation ####################
-    def compute_Ksi(self, selectedpoint, correctionpoint, realpoint,listofpoints=None):
 
-
-        return 1
     
     def __histSubstract(self, h1,h2):
         diff = 0
@@ -223,17 +221,12 @@ class HistogramLocalization():
             copyCurrentList.append(copyCurrentList.pop(0))
 
         orient = math.radians((len(diffOrient)-np.argmin(diffOrient))*(360//self.__orientSectionNumber))
-        # # print()
-        # print(self.__map[np.argmin(diffList)][0], ' poczatkowy')
-        # print(pointsXList)
-        # print(pointsYList)
+
         zX = self.__histSubstract(Apoint, xHist[aX])
         zY =  self.__histSubstract(Apoint,  yHist[aY])
         xiX = abs(1-(neighbXErrList[aX]/zX))*G[0]
         xiY = abs(1-(neighbYErrList[aY]/zY))*G[1]
-        print(zX/zY, ' ratio zx/zy')
-        print(a, 'wytypowany')
- 
+
         p = [round(self.__map[np.argmin(diffList)][0][0]+(pointsXList[aX][0] -self.__map[np.argmin(diffList)][0][0])*xiX,4),
              round(self.__map[np.argmin(diffList)][0][1]+(pointsYList[aY][1] - self.__map[np.argmin(diffList)][0][1])*xiY,4)]
         return {"point":p,"orientation":orient,"ksiX": xiX,"ksiY":xiY}
@@ -246,9 +239,8 @@ class HistogramLocalization():
         diffList = []
         for i in self.__map:
             diff = 0
-            for j in range(0, self.__binsNumber):
-                diff += abs(i[1][j]-hist1[j])
-            diffList.append(diff)
+            diffList.append(self.__histSubstract(i[1],hist1))
+            
         diffList = np.array(diffList)
         # print('Selected point:', self.__map[np.argmin(diffList)][0])
         #####################################################
