@@ -107,8 +107,6 @@ class ProbabLocalization():
         return currentProbList
 
     def  makeProbabDescrOneScanLocalMin(self, scan):
-    #     print(type(scan))
-    #     print(len(scan))
         localMin = np.argmin(scan)
         newScan =  scan[localMin:-1] + [scan[-1]]+scan[0:localMin]
         perSection = (len(scan))//self.__sectionsNumberLocalization
@@ -207,23 +205,17 @@ class ProbabLocalization():
         
         zX = self.__MarkvectSubstract(Apoint, xProb[aX])
         zY =  self.__MarkvectSubstract(Apoint,  yProb[aY])
+
         xiX = abs(1-(neighbXErrList[aX]/zX))*G[0]
         xiY = abs(1-(neighbYErrList[aY]/zY))*G[1]
-        # print("  nX:", neighbXErrList[aX], "  zX: ",zX,  " xiX: ", xiX)
-        # print("  nX:", neighbYErrList[aY], "  zY: ",zY, " xiY: ", xiY)
-        # print("ratio", xiX/xiY)
-        
+
         p = [round(self.__posMap[np.argmin(diffList)][0][0]+(pointsXList[aX][0] -self.__posMap[np.argmin(diffList)][0][0])*xiX,4),
              round(self.__posMap[np.argmin(diffList)][0][1]+(pointsYList[aY][1] -self.__posMap[np.argmin(diffList)][0][1])*xiY,4)]
-        
-        
-        
+
         return {"point":p,"orientation":orient,"ksiX": xiX,"ksiY":xiY}
 
 
         #print(currentPoint)
-
-
 
 
 ######################################################################
@@ -239,19 +231,3 @@ class ProbabLocalization():
         self.sub.unregister()
             
             
-
-
-# def __main__():
-#     fileName = './map/testMap.json'
-#     hm = ProbabLocalization()
-#     hm.initTopicConnection()
-#     time.sleep(0.1)
-#     hm.loadMapLocalMin(fileName)
-#     print('###############################')
-#     hm.locateRobotLocalMinimum()
-#     print('###############################')
-
-#     rospy.spin()
-
-# if __name__ == "__main__":
-#     __main__()

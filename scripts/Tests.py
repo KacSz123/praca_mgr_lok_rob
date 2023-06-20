@@ -119,74 +119,6 @@ def K_parameter_testsProbab(name):
             with open(name[:-4]+'G-'+str(g)+'-plot-prob'+str(s)+'s.pkl', 'wb') as f:
                 pickle.dump(okok, f)
 
-    # plt.figure(2)
-    # plt.plot(xlist, xerr)
-    # plt.show()
-    # input()
-    # ksi=[]
-    # xlist=[]
-    # xerr=[]
-    # # for i in range(len(data)//2, len(data)):
-    # #     xlist.append(data[i]['pose'][0])
-    # #     # print(i["pose"], 'rzeczywisty')
-    # #     p=hm.locateRobot(scanT=data[i]["scan"])
-    # #     errorList.append(Dist2Points(p["point"],data[i]["pose"]))
-    # #     orientErrList.append(abs(p["orientation"]-data[i]["pose"][2]))
-        
-    # #     print(p['point'], 'skorygowany')
-    # #     print(data[i]['pose'], 'rzeczywisty')
-    # #     print()
-    # #     xerr.append(abs(p['point'][0]-data[i]['pose'][0]))
-    # #     ksi.append(p['ksiX'])
-    # # plt.figure(1)
-    # # plt.plot(xlist, ksi,'.')
-    # # plt.xlabel('Pozycja robota na osi X')
-    # # plt.xlabel('Wartość parametru ξ')
-
-    # # plt.title('Wartość parametru ξ dla: '+str(data[len(data)//2+1]['pose'][0])+'do'+str(data[-1]['pose'][0]))
-    # # plt.show()
-    # # plt.figure(2)
-    # # plt.plot(xlist, xerr,'.')
-    # # plt.show()
-    # input()
-        # print(p['point'], 'obliczony')
-        # pritn
-        # print()
-    # print(errorList)
-    # print(orientErrList)
-    # with open("./someTests/hist-debug2.pkl", 'wb') as f:
-    #     pickle.dump(errorList, f)
-    # with open("./someTests/hist-debug2.pkl", 'rb') as f:
-    #     d = pickle.load(f)
-    # s=pd.Series(d)
-    # for i in data:
-    #     print(i["pose"])
-    # print(len(data))
-    # print
-        # i = data[random.randint(0, 1000)]
-
-    # i  =  random.choice(data)
-    
-    # print(i["pose"], 'rzeczywisty')
-    # p=hm.locateRobot(scanT=i["scan"])
-    # # Kerror.append(Dist2Points(p["point"],i["pose"]))
-    # # orientErrList.append(abs(p["orientation"]-i["pose"][2]))
-    # # print([round(i,2) for i in p['point']], 'obliczony')
-    
-    # print(i["pose"])
-    # print(p["p_origin"], 'origin')
-    # pritn
-    # print()
-    # print(Kerror)
-    # print(orientErrList)
-    # with open("./someTests/Kx-debug.pkl", 'wb') as f:
-    #     pickle.dump(Kerror, f)
-    # with open("./someTests/hist-debug2.pkl", 'rb') as f:
-    #     d = pickle.load(f)
-    # s=pd.Series(d)
-    # print("localization")
-    # print(s.describe())
-    
 
 
 def writeMapTofileJson(name):
@@ -310,11 +242,6 @@ def orientationCircle():
 
 
 def generateStatisticsHist():
-    # with open('./results/hist-debug-local.pkl', 'rb') as f:
-    #     data = pickle.load(f)
-    # s=pd.Series(data)
-    # print("localization")
-    # print(s.describe())
     with open('./results/hist-Shelf-1000pts-orient-p2-sec25.pkl', 'rb') as f:
         data2 = pickle.load(f)
     s2=pd.Series(data2)
@@ -402,14 +329,3 @@ def __main__():
 if __name__ == "__main__":
     __main__()
 
-
-    """
-    count    1000.00
-mean        0.162
-std         0.3126
-min         0.000
-25%         0.040
-50%         0.140
-75%         0.250
-max         7.100
-    """

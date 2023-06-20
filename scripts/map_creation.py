@@ -12,6 +12,7 @@ import random
 import math
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 # from mymath import *
+
 class mapCreation():
     def __init__(self, modelName='myRobot', startPose=(-4,1,0),fileName = 'testMap'):
         rospy.wait_for_service('/gazebo/set_model_state')

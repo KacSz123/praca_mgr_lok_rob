@@ -2,14 +2,11 @@
 import rospy
 from sensor_msgs.msg import LaserScan
 from mymath import *
-import time
 import json
 import pickle
 import numpy as np
-import matplotlib.pyplot as plt
-import copy
-import sys
-from map_creation import mapCreation as mC
+
+
 ###################################
 # def twoPointsDist(a,b):
 #     return math.sqrt(pow(a[0]-b[0],2)+pow(a[1]-b[1],2))
@@ -161,9 +158,12 @@ class HistogramLocalization():
                 diff += abs(i[1][j]-hist1[j])
             diffList.append(diff)
         diffList = np.array(diffList)
+
+
+
         ######################################################################
         ######################################################################
-        ####### sprawdzenie okolicy
+        ####### neighbours checking
         ######################################################################
         ######################################################################
         a = self.__map[np.argmin(diffList)][0]
