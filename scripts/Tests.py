@@ -103,6 +103,7 @@ def K_parameter_testsProbab(name):
                 xlist.append(data[i]['pose'][0])
                 ylist.append(data[i]['pose'][1])
                 # print(i["pose"], 'rzeczywisty')
+                # print(i['pose'])
                 p=hm.locateRobotLocalMinimum(fileScan=data[i]["scan"], G=g)
                 errorList.append(Dist2Points(p["point"],data[i]["pose"]))
                 orientErrList.append(abs(p["orientation"]-data[i]["pose"][2]))
