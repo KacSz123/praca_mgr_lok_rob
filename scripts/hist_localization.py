@@ -1,11 +1,13 @@
 # from rospy_message_converter import json_message_converter
 import rospy
 from sensor_msgs.msg import LaserScan
-from mymath import *
+
 import json
 import pickle
 import numpy as np
 
+from errors_and_results import LocalizationResult, HistLocalizationErrors
+from mymath import *
 
 ###################################
 # def twoPointsDist(a,b):
@@ -26,7 +28,7 @@ class HistogramLocalization():
         self.__binsNumber=bins
         self.__orientSectionNumber=orientSection
         self.__mapRes = round(mRes,2)
-        print(self.__binsNumber)
+        
     def loadMapJson(self, fileName):
         _scan = []
         _scango = []
@@ -144,7 +146,7 @@ class HistogramLocalization():
             diff += abs(h1[j]-h2[j])
         return diff/self.__binsNumber
 
-    def locateRobot(self, scanT=None,  G=(1.05, 1.1)):
+    def locateRobot(self, scanT: list=None,  G=(1.05, 1.1)):
         if scanT!=None and self.__ifSubscribing==False:
             tmpscan=scanT
         else:
@@ -167,9 +169,8 @@ class HistogramLocalization():
         ######################################################################
         ######################################################################
         a = self.__map[np.argmin(diffList)][0]
-        # print(a)
         Apoint = self.__map[np.argmin(diffList)][1]
-        # print(Apoint)
+
         searchListX = [[round(a[0]+self.__mapRes,1), round(a[1],1),0],[round(a[0]-self.__mapRes,1), round(a[1],1),0]]
         searchListY = [[round(a[0],1), round(a[1]+self.__mapRes,1),0],[round(a[0],1), round(a[1]-self.__mapRes,1),0]]
 
@@ -193,13 +194,9 @@ class HistogramLocalization():
 
         neighbXErrList = np.array(neighbXErrList)
         aX=np.argmin(neighbXErrList)
-        # print(pointsXList)
-        # print(neighbXErrList)
-        # print(aX)
         neighbYErrList = np.array(neighbYErrList)
         aY=np.argmin(neighbYErrList)
-        # print(pointsXList)
-        # print(neighbXErrList)
+
 
         ######## orientation
         currentOrientList = self.generateOrientList(tmpscan)
@@ -229,11 +226,11 @@ class HistogramLocalization():
 
         p = [round(self.__map[np.argmin(diffList)][0][0]+(pointsXList[aX][0] -self.__map[np.argmin(diffList)][0][0])*xiX,4),
              round(self.__map[np.argmin(diffList)][0][1]+(pointsYList[aY][1] - self.__map[np.argmin(diffList)][0][1])*xiY,4)]
-        return {"point":p,"orientation":orient,"ksiX": xiX,"ksiY":xiY}
+        return LocalizationResult(p, orient, xiX, xiY)
 
 
 
-    def locateRobotScan(self,scanT):
+    def locateRobotScan(self,scanT:list = None)->LocalizationResult:
         tmpscan = list(scanT).copy()
         hist1, b = np.histogram(tmpscan, range=(0.0, 10.0), bins=self.__binsNumber)
         diffList = []
@@ -242,7 +239,6 @@ class HistogramLocalization():
             diffList.append(self.__histSubstract(i[1],hist1))
             
         diffList = np.array(diffList)
-        # print('Selected point:', self.__map[np.argmin(diffList)][0])
         #####################################################
         # orientation
         currentOrientList = self.generateOrientList(tmpscan)
@@ -264,9 +260,8 @@ class HistogramLocalization():
             copyCurrentList.append(copyCurrentList.pop(0))
 
         orient = math.radians((len(diffOrient)-np.argmin(diffOrient))*(360//self.__orientSectionNumber))
-        
-        # print("Orientation: ", orient)
-        return {"point":self.__map[np.argmin(diffList)][0],"orientation":orient}
+
+        return LocalizationResult(self.__map[np.argmin(diffList)][0],orient)
     
     
     def callback(self, msg):

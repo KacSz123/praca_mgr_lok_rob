@@ -3,3 +3,5 @@
 scripts/map/*.json
 scripts/res-thesis
 scripts/res-thesis/*
+.vscode
+doxygen

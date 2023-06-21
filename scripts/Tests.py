@@ -27,7 +27,7 @@ signal.signal(signal.SIGINT, handler)
 def K_parameter_tests(name):
     errorList = []
     orientErrList = []
-    sec=200
+    sec=40
     hm=HistogramLocalization(bins=sec,orientSection=25)
     with open(name, 'rb') as f:
         data = pickle.load(f)
@@ -35,31 +35,31 @@ def K_parameter_tests(name):
     hm.loadMapPickle(fileName=mapFile)
     print(1)
         # i = data[random.randint(0, 1000)]
-    ksiX=[]
-    ksiY=[]
+    xiX=[]
+    xiY=[]
     xlist=[]
     ylist=[]
     xerr=[]
     yerr=[]
-    Ge=(0.95,0.95)
+    Ge=(0.9,0.00)
     for i in range(0, len(data)):
         xlist.append(data[i]['pose'][0])
         ylist.append(data[i]['pose'][1])
         # xlist.append(data[i]['pose'][0])
         # print(i["pose"], 'rzeczywisty')
         p=hm.locateRobot(scanT=data[i]["scan"], G=Ge)
-        errorList.append(Dist2Points(p["point"],data[i]["pose"]))
-        orientErrList.append(abs(p["orientation"]-data[i]["pose"][2]))
+        errorList.append(Dist2Points(p.pose,data[i]["pose"]))
+        orientErrList.append(abs(p.orientation-data[i]["pose"][2]))
         
         print(p['point'], 'skorygowany')
         print(data[i]['pose'], 'rzeczywisty')
         print()
-        xerr.append(abs(p['point'][1]-data[i]['pose'][1]))
-        ksiX.append(p['ksiX'])
-        ksiY.append(p['ksiY'])
+        xerr.append(abs(p.point[1]-data[i]['pose'][1]))
+        xiX.append(p.xiX)
+        xiY.append(p.xiY)
     plt.figure(1)
-    plt.plot(xlist, ksiX,'.',color='r')
-    plt.plot(xlist, ksiY,'+',color='g')
+    plt.plot(xlist, xiX,'.',color='r')
+    plt.plot(xlist, xiY,'+',color='g')
     tmp=[]
     for i in np.arange(0.0, 0.5, 0.01): 
         tmp.append(round(i,2))
@@ -71,7 +71,7 @@ def K_parameter_tests(name):
     plt.xlabel('Pozycja robota na osi Y')
     plt.ylabel('Wartość parametru ξ')
     plt.show()
-    okok = {'ksiX':ksiX, 'ksiY':ksiY, 'Y':ylist, 'X':xlist}
+    okok = {'xiX':xiX, 'xiY':xiY, 'Y':ylist, 'X':xlist}
     with open(name[:-4]+'G'+str(Ge)+'-plotb'+str(sec)+'s.pkl', 'wb') as f:
         pickle.dump(okok, f)
 
@@ -91,8 +91,8 @@ def K_parameter_testsProbab(name):
             hm.loadMapLocalMinPickle(fileName=mapFile)
             print(1)
                 # i = data[random.randint(0, 1000)]
-            ksiX=[]
-            ksiY=[]
+            xiX=[]
+            xiY=[]
             xlist=[]
             ylist=[]
             # xerr=[]
@@ -108,14 +108,14 @@ def K_parameter_testsProbab(name):
                 errorList.append(Dist2Points(p["point"],data[i]["pose"]))
                 orientErrList.append(abs(p["orientation"]-data[i]["pose"][2]))
                 
-                print(p['point'], 'skorygowany')
+                print(p.pose, 'skorygowany')
                 print(data[i]['pose'], 'rzeczywisty')
                 print()
                 # xerr.append(abs(p['point'][1]-data[i]['pose'][1]))
-                ksiX.append(p['ksiX'])
-                ksiY.append(p['ksiY'])
+                xiX.append(p.xiX)
+                xiY.append(p.xiY)
             # plt.figure(1)75
-            okok = {'ksiY':ksiY,'ksiX':ksiX, 'X':xlist, 'Y':ylist }
+            okok = {'xiY':xiY,'xiX':xiX, 'X':xlist, 'Y':ylist }
             with open(name[:-4]+'G-'+str(g)+'-plot-prob'+str(s)+'s.pkl', 'wb') as f:
                 pickle.dump(okok, f)
 
@@ -260,9 +260,9 @@ def probabLocalizationOrientationTest():
     print(1)
     for i in data:
         print(i["pose"])
-        p,o=pm.locateRobotLocalMinimum(fileScan=i["scan"])
-        errorList.append(Dist2Points(p,i["pose"]))
-        orientErrList.append((abs(o-i["pose"][2])))
+        p=pm.locateRobotLocalMinimum(fileScan=i["scan"])
+        errorList.append(Dist2Points(p.pose,i["pose"]))
+        orientErrList.append((abs(p.orientation-i["pose"][2])))
     #print(errorList)
     print(orientErrList)
     with open(RESULTS_DIR+'probab-local-neigh-5s.pkl', 'wb') as f:
@@ -284,8 +284,8 @@ def probabLocalizationOrientationTestNei():
         for i in data:
             # print(i["pose"]2
             p=pm.locateRobotLocalMinimum(fileScan=i["scan"], G=(0.95,0.95))
-            errorList.append(Dist2Points(p['point'],i["pose"]))
-            orientErrList.append((abs(p['orientation']-i["pose"][2])))
+            errorList.append(Dist2Points(p.pose,i["pose"]))
+            orientErrList.append((abs(p.orientation-i["pose"][2])))
         #print(errorList)
         # print(orientErrList)
         with open(RESULTS_DIR+'probab-local-neigh-'+ str(sec)+'s.pkl', 'wb') as f:
@@ -323,8 +323,8 @@ def __main__():
     # prezka()
     # histLocalizationTestImpr()
     # writeMapTofilePickleForKsi('point-XY_K_map')
-    # K_parameter_tests('./map/point-XY_K_map.pkl')
-    K_parameter_testsProbab('./map/point-XY_K_map.pkl')
+    K_parameter_tests('./map/point43-44X_K_map.pkl')
+    # K_parameter_testsProbab('./map/point-XY_K_map.pkl')
     # orientationCircle()
 if __name__ == "__main__":
     __main__()
